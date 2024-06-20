@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 
 const FormSchema = z.object({
 	email: z.string().email(),
@@ -72,10 +73,9 @@ export default function Login() {
 							<Button className="w-full" type="submit">Iniciar Sesión</Button>
 						</form>
 					</Form>
-
+					<p className="text-center mt-3 font-light text-sm">¿No tienes una cuenta? <Link href="/register" className="font-bold ms-1 text-slate">Registrarse</Link></p>
 				</CardContent>
 			</Card>
-
 		</div>
 	)
 }
