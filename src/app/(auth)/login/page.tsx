@@ -31,12 +31,24 @@ export default function Login() {
 		},
 	})
 
-	function onSubmit(data: z.infer<typeof FormSchema>) {
-		console.log(data);
+	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		try {
+			const res = await fetch("http://localhost:3000/auth/login", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			});
+			const user = await res.json();
+			console.log(user);
+		} catch (err) {
+			console.error("Error login: ", err);
+		}
 	}
 
 	return (
-		<div className="w-full h-screen flex items-center justify-center px-4 ">
+		<div className="w-full h-screen flex items-center justify-center px-4 bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
 			<Card className="w-full max-w-sm">
 				<CardHeader>
 					<CardTitle>Iniciar Sesión</CardTitle>

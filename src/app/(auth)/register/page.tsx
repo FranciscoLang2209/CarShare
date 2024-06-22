@@ -15,8 +15,10 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Link from "next/link"
 
 const FormSchema = z.object({
+	name: z.string().min(4),
 	email: z.string().email(),
 	password: z.string().min(4)
 })
@@ -25,17 +27,31 @@ export default function Register() {
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
+			name: "",
 			email: "",
 			password: ""
 		},
 	})
 
-	function onSubmit(data: z.infer<typeof FormSchema>) {
-		console.log(data);
+	async function onSubmit(data: z.infer<typeof FormSchema>) {
+		console.log(JSON.stringify(data))
+		try {
+			const res = await fetch("http://localhost:3000/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(data),
+			});
+			const user = await res.json();
+			console.log(user);
+		} catch (err) {
+			console.error("Error register: ", err);
+		}
 	}
 
 	return (
-		<div className="w-full h-screen flex items-center justify-center px-4 ">
+		<div className="w-full h-screen flex items-center justify-center px-4 bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
 			<Card className="w-full max-w-sm">
 				<CardHeader>
 					<CardTitle>Registrarse</CardTitle>
@@ -43,6 +59,19 @@ export default function Register() {
 				<CardContent>
 					<Form {...form}>
 						<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+							<FormField
+								control={form.control}
+								name="name"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel>Nombre</FormLabel>
+										<FormControl>
+											<Input {...field} />
+										</FormControl>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 							<FormField
 								control={form.control}
 								name="email"
@@ -72,6 +101,7 @@ export default function Register() {
 							<Button className="w-full" type="submit">Registrarse</Button>
 						</form>
 					</Form>
+					<p className="text-center mt-3 font-light text-sm">¿Ya tienes una cuenta? <Link href="/login" className="font-bold ms-1 text-slate">Iniciar sesión</Link></p>
 				</CardContent>
 			</Card>
 		</div>
