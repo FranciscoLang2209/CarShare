@@ -16,6 +16,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
+import { useAuth } from "@/hooks/useAuth"
+import { User } from "@/types"
+import Cookies from 'js-cookie';
+import { useRouter } from "next/navigation"
 
 const FormSchema = z.object({
 	email: z.string().email(),
@@ -23,6 +27,8 @@ const FormSchema = z.object({
 })
 
 export default function Login() {
+	const { setUser } = useAuth();
+	const router = useRouter()
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -33,15 +39,18 @@ export default function Login() {
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		try {
-			const res = await fetch("http://localhost:3000/auth/login", {
+			const res = await fetch("http://localhost:5000/auth/login", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(data),
 			});
-			const user = await res.json();
-			console.log(user);
+			const response = await res.json();
+			const user: User = response.user;
+			setUser(user._id);
+			Cookies.set('user', user._id, { expires: 1 }); // Expires in 1 day
+			router.push("/");
 		} catch (err) {
 			console.error("Error login: ", err);
 		}

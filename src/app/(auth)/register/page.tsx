@@ -16,6 +16,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
+import { useAuth } from "@/hooks/useAuth"
+import { User } from "@/types"
+import Cookies from 'js-cookie';
+import { useRouter } from "next/navigation"
 
 const FormSchema = z.object({
 	name: z.string().min(4),
@@ -24,6 +28,8 @@ const FormSchema = z.object({
 })
 
 export default function Register() {
+	const { setUser } = useAuth();
+	const router = useRouter();
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
 		defaultValues: {
@@ -36,15 +42,17 @@ export default function Register() {
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		console.log(JSON.stringify(data))
 		try {
-			const res = await fetch("http://localhost:3000/auth/register", {
+			const res = await fetch("http://localhost:5000/auth/register", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(data),
 			});
-			const user = await res.json();
-			console.log(user);
+			const user: User = await res.json();
+			setUser(user._id);
+			Cookies.set('user', user._id, { expires: 1 }); // Expires in 1 day
+			router.push("/");
 		} catch (err) {
 			console.error("Error register: ", err);
 		}
