@@ -27,7 +27,7 @@ const FormSchema = z.object({
 })
 
 export default function Login() {
-	const { setUser } = useAuth();
+	const { setUser, setName } = useAuth();
 	const router = useRouter()
 	const form = useForm<z.infer<typeof FormSchema>>({
 		resolver: zodResolver(FormSchema),
@@ -49,7 +49,9 @@ export default function Login() {
 			const response = await res.json();
 			const user: User = response.user;
 			setUser(user._id);
+			setName(user.name)
 			Cookies.set('user', user._id, { expires: 1 }); // Expires in 1 day
+			Cookies.set('name', user.name, { expires: 1 }); // Expires in 1 day
 			router.push("/");
 		} catch (err) {
 			console.error("Error login: ", err);
