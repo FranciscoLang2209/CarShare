@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
+import SessionControl from "./session-control";
 
 export default function Stats() {
 	const router = useRouter();
@@ -82,6 +83,7 @@ export default function Stats() {
 						</Button>
 					</CardContent>
 				</Card>
+				<SessionControl />
 			</div>
 		</div>
 	)
