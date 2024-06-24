@@ -13,10 +13,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table"
+import dayjs from "dayjs";
 
 const getSessions = async () => {
 	try {
-		const res = await fetch("http://localhost:5000/user/sessions")
+		const res = await fetch("http://localhost:5000/user/sessions", { cache: 'no-store' })
 		const data = await res.json();
 		console.log(data)
 		return data;
@@ -45,12 +46,12 @@ export default async function TripList() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{sessions.map((session: any, index: number) => (
+						{sessions && sessions.map((session: any, index: number) => (
 							<TableRow className={index % 2 == 0 ? "bg-accent" : ""}>
-								<TableCell>{session._id}</TableCell>
+								<TableCell>{session.user.name}</TableCell>
 								<TableCell className="hidden sm:table-cell">{session.distance}</TableCell>
-								<TableCell className="hidden md:table-cell">{}</TableCell>
-								<TableCell className="text-right">$250.00</TableCell>
+								<TableCell className="hidden md:table-cell">{dayjs(session.start_time).format("DD-MM-YYYY")}</TableCell>
+								<TableCell className="text-right">$ {((session.distance / 11.5) * 1013).toFixed(2)}</TableCell>
 							</TableRow>
 						))}
 					</TableBody>

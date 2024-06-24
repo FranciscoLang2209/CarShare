@@ -6,10 +6,32 @@ import Image from "next/image";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 export default function Stats() {
 	const router = useRouter();
-	const { name } = useAuth();
+	const { user, name } = useAuth();
+	const [balance, setBalance] = useState(0);
+
+	useEffect(() => {
+		const getBalance = async () => {
+			try {
+				const res = await fetch("http://localhost:5000/user/cost", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ user })
+				});
+				const data = await res.json();
+				setBalance(data.totalCost);
+				console.log(data)
+			} catch (err) {
+				console.error("Error", err)
+			}
+		}
+		getBalance();
+	}, [user])
 
 	return (
 		<div className="flex flex-wrap gap-4 items-start">
@@ -42,7 +64,7 @@ export default function Stats() {
 					</CardHeader>
 					<CardContent>
 						<p className="font-bold text-red-700 text-2xl">
-							- $5100
+							- ${balance.toFixed(0)}
 						</p>
 					</CardContent>
 				</Card>
