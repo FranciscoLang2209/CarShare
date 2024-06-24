@@ -39,7 +39,7 @@ export default function Login() {
 
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		try {
-			const res = await fetch("http://localhost:5000/auth/login", {
+			const res = await fetch("http://localhost:3001/auth/login", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",

@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import mqtt from "mqtt";
 
 export default function SessionControl() {
-	const client = mqtt.connect("ws:100.25.245.208:9001");
+	const client = mqtt.connect("ws://localhost:9001");
 
 	client.on("connect", () => {
 		console.log("Connected mqtt")
@@ -15,6 +15,11 @@ export default function SessionControl() {
 		client.publish("carshare/inel00/session/start", "1");
 	}
 
+	const handleStop = () => {
+		client.publish("carshare/inel00/session/stop", "1");
+	}
+
+
 	return (
 		<Card>
 			<CardHeader>
@@ -22,6 +27,9 @@ export default function SessionControl() {
 			</CardHeader>
 			<CardContent>
 				<Button onClick={handleStart}>Iniciar</Button>
+			</CardContent>
+			<CardContent>
+				<Button onClick={handleStop}>Terminar</Button>
 			</CardContent>
 		</Card>
 	)

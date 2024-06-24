@@ -17,7 +17,7 @@ export default function Stats() {
 	useEffect(() => {
 		const getBalance = async () => {
 			try {
-				const res = await fetch("http://localhost:5000/user/cost", {
+				const res = await fetch("http://localhost:3001/user/cost", {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

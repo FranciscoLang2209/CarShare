@@ -42,7 +42,7 @@ export default function Register() {
 	async function onSubmit(data: z.infer<typeof FormSchema>) {
 		console.log(JSON.stringify(data))
 		try {
-			const res = await fetch("http://localhost:5000/auth/register", {
+			const res = await fetch("http://localhost:3001/auth/register", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
