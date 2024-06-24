@@ -49,9 +49,10 @@ export default function Register() {
 				},
 				body: JSON.stringify(data),
 			});
-			const user: User = await res.json();
+			const response = await res.json();
+			const user: User = response.user;
 			setUser(user._id);
-			setName(user.name);
+			setName(user.name)
 			Cookies.set('user', user._id, { expires: 1 }); // Expires in 1 day
 			Cookies.set('name', user.name, { expires: 1 }); // Expires in 1 day
 			router.push("/");
