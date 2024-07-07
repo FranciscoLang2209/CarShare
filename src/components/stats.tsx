@@ -76,6 +76,7 @@ export default function Stats() {
 					<CardContent className="flex items-center gap-3">
 						<p className="font-bold">{name}</p>
 						<Button variant="destructive" onClick={() => {
+							Cookies.remove("name");
 							Cookies.remove("user");
 							router.push("/login")
 						}}>
