@@ -24,9 +24,14 @@ export const useAuthForm = (): UseAuthFormReturn => {
 
     try {
       const response = await authApi.login(data.email, data.password);
+      console.log('🔍 Login response:', response);
       
       if (response.success && response.data) {
         const { user } = response.data;
+        console.log('👤 Login user data received:', user);
+        console.log('🆔 Login user ID:', user.id);
+        console.log('📛 Login user name:', user.name);
+        
         setUser(user.id);
         setName(user.name);
         cookieService.setAuthData(user.id, user.name);
