@@ -25,17 +25,32 @@ export const useAuthForm = (): UseAuthFormReturn => {
     try {
       const response = await authApi.login(data.email, data.password);
       console.log('🔍 Login response:', response);
+      console.log('🔍 Login response.data:', response.data);
+      console.log('🔍 Type of response.data:', typeof response.data);
+      console.log('🔍 Keys of response.data:', Object.keys(response.data || {}));
       
       if (response.success && response.data) {
-        const { user } = response.data;
-        console.log('👤 Login user data received:', user);
-        console.log('🆔 Login user ID:', user.id);
-        console.log('📛 Login user name:', user.name);
+        // Try different ways to access the user data
+        let user = response.data;
         
-        setUser(user.id);
-        setName(user.name);
-        cookieService.setAuthData(user.id, user.name);
-        router.push('/');
+        // Check if it's nested under 'user' key
+        if ((response.data as any).user) {
+          user = (response.data as any).user;
+          console.log('📝 Found user in nested structure');
+        }
+        
+        console.log('👤 Login user data received:', user);
+        console.log('🆔 Login user ID:', (user as any)?.id);
+        console.log('📛 Login user name:', (user as any)?.name);
+        
+        if (user && (user as any).id) {
+          setUser((user as any).id);
+          setName((user as any).name);
+          cookieService.setAuthData((user as any).id, (user as any).name);
+          router.push('/');
+        } else {
+          setError('Error al procesar los datos del usuario');
+        }
       } else {
         setError(response.error || 'Error al iniciar sesión');
       }
@@ -53,17 +68,32 @@ export const useAuthForm = (): UseAuthFormReturn => {
     try {
       const response = await authApi.register(data.name, data.email, data.password);
       console.log('🔍 Registration response:', response);
+      console.log('🔍 Registration response.data:', response.data);
+      console.log('🔍 Type of response.data:', typeof response.data);
+      console.log('🔍 Keys of response.data:', Object.keys(response.data || {}));
       
       if (response.success && response.data) {
-        const { user } = response.data;
-        console.log('👤 User data received:', user);
-        console.log('🆔 User ID:', user.id);
-        console.log('📛 User name:', user.name);
+        // Try different ways to access the user data
+        let user = response.data;
         
-        setUser(user.id);
-        setName(user.name);
-        cookieService.setAuthData(user.id, user.name);
-        router.push('/');
+        // Check if it's nested under 'user' key
+        if ((response.data as any).user) {
+          user = (response.data as any).user;
+          console.log('� Found user in nested structure');
+        }
+        
+        console.log('�👤 User data received:', user);
+        console.log('🆔 User ID:', (user as any)?.id);
+        console.log('📛 User name:', (user as any)?.name);
+        
+        if (user && (user as any).id) {
+          setUser((user as any).id);
+          setName((user as any).name);
+          cookieService.setAuthData((user as any).id, (user as any).name);
+          router.push('/');
+        } else {
+          setError('Error al procesar los datos del usuario');
+        }
       } else {
         setError(response.error || 'Error al registrarse');
       }

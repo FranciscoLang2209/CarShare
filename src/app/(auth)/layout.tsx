@@ -11,8 +11,8 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
   return (
-    <html lang="es">
-      <body>{children}</body>
-    </html>
+    <div className="auth-layout">
+      {children}
+    </div>
   );
 }

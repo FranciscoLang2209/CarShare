@@ -26,8 +26,17 @@ async function apiRequest<T>(
       throw new ApiError(`HTTP error! status: ${response.status}`, response.status);
     }
 
-    const data = await response.json();
-    return { success: true, data };
+    const backendResponse = await response.json();
+    
+    // Handle the backend's wrapped response format
+    if (backendResponse.success) {
+      return { success: true, data: backendResponse.data };
+    } else {
+      return {
+        success: false,
+        error: backendResponse.message || 'Backend error occurred',
+      };
+    }
   } catch (error) {
     console.error(`API Error - ${endpoint}:`, error);
     return {
@@ -38,15 +47,15 @@ async function apiRequest<T>(
 }
 
 export const authApi = {
-  async login(email: string, password: string): Promise<ApiResponse<{ user: User }>> {
-    return apiRequest<{ user: User }>('/auth/login', {
+  async login(email: string, password: string): Promise<ApiResponse<User>> {
+    return apiRequest<User>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
   },
 
-  async register(name: string, email: string, password: string): Promise<ApiResponse<{ user: User }>> {
-    return apiRequest<{ user: User }>('/auth/register', {
+  async register(name: string, email: string, password: string): Promise<ApiResponse<User>> {
+    return apiRequest<User>('/auth/register', {
       method: 'POST',
       body: JSON.stringify({ name, email, password }),
     });
