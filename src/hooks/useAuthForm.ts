@@ -27,9 +27,9 @@ export const useAuthForm = (): UseAuthFormReturn => {
       
       if (response.success && response.data) {
         const { user } = response.data;
-        setUser(user._id);
+        setUser(user.id);
         setName(user.name);
-        cookieService.setAuthData(user._id, user.name);
+        cookieService.setAuthData(user.id, user.name);
         router.push('/');
       } else {
         setError(response.error || 'Error al iniciar sesión');
@@ -50,9 +50,9 @@ export const useAuthForm = (): UseAuthFormReturn => {
       
       if (response.success && response.data) {
         const { user } = response.data;
-        setUser(user._id);
+        setUser(user.id);
         setName(user.name);
-        cookieService.setAuthData(user._id, user.name);
+        cookieService.setAuthData(user.id, user.name);
         router.push('/');
       } else {
         setError(response.error || 'Error al registrarse');
