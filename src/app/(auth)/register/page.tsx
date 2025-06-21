@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-
-import { Button } from "@/components/ui/button"
+import React, { memo } from 'react';
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 import {
 	Form,
 	FormControl,
@@ -12,54 +11,28 @@ import {
 	FormItem,
 	FormLabel,
 	FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
-import { useAuth } from "@/hooks/useAuth"
-import { User } from "@/types"
-import Cookies from 'js-cookie';
-import { useRouter } from "next/navigation"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { RegisterSchema, RegisterFormData } from "@/schemas/auth";
+import { useAuthForm } from "@/hooks/useAuthForm";
 
-const FormSchema = z.object({
-	name: z.string().min(4),
-	email: z.string().email(),
-	password: z.string().min(4)
-})
-
-export default function Register() {
-	const { setUser, setName } = useAuth();
-	const router = useRouter();
-	const form = useForm<z.infer<typeof FormSchema>>({
-		resolver: zodResolver(FormSchema),
+const Register = memo(() => {
+	const { register: registerUser, isLoading, error } = useAuthForm();
+	
+	const form = useForm<RegisterFormData>({
+		resolver: zodResolver(RegisterSchema),
 		defaultValues: {
 			name: "",
 			email: "",
 			password: ""
 		},
-	})
+	});
 
-	async function onSubmit(data: z.infer<typeof FormSchema>) {
-		console.log(JSON.stringify(data))
-		try {
-			const res = await fetch("http://localhost:3001/auth/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(data),
-			});
-			const response = await res.json();
-			const user: User = response.user;
-			setUser(user._id);
-			setName(user.name)
-			Cookies.set('user', user._id, { expires: 1 }); // Expires in 1 day
-			Cookies.set('name', user.name, { expires: 1 }); // Expires in 1 day
-			router.push("/");
-		} catch (err) {
-			console.error("Error register: ", err);
-		}
-	}
+	const onSubmit = async (data: RegisterFormData) => {
+		await registerUser(data);
+	};
 
 	return (
 		<div className="w-full h-screen flex items-center justify-center px-4 bg-white bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]">
@@ -77,9 +50,13 @@ export default function Register() {
 									<FormItem>
 										<FormLabel>Nombre</FormLabel>
 										<FormControl>
-											<Input {...field} />
+											<Input 
+												{...field} 
+												disabled={isLoading}
+												aria-describedby={form.formState.errors.name ? "name-error" : undefined}
+											/>
 										</FormControl>
-										<FormMessage />
+										<FormMessage id="name-error" />
 									</FormItem>
 								)}
 							/>
@@ -90,9 +67,14 @@ export default function Register() {
 									<FormItem>
 										<FormLabel>Email</FormLabel>
 										<FormControl>
-											<Input type="email" {...field} />
+											<Input 
+												type="email" 
+												{...field} 
+												disabled={isLoading}
+												aria-describedby={form.formState.errors.email ? "email-error" : undefined}
+											/>
 										</FormControl>
-										<FormMessage />
+										<FormMessage id="email-error" />
 									</FormItem>
 								)}
 							/>
@@ -103,18 +85,53 @@ export default function Register() {
 									<FormItem>
 										<FormLabel>Contraseña</FormLabel>
 										<FormControl>
-											<Input type="password" {...field} />
+											<Input 
+												type="password" 
+												{...field} 
+												disabled={isLoading}
+												aria-describedby={form.formState.errors.password ? "password-error" : undefined}
+											/>
 										</FormControl>
-										<FormMessage />
+										<FormMessage id="password-error" />
 									</FormItem>
 								)}
 							/>
-							<Button className="w-full" type="submit">Registrarse</Button>
+
+							{error && (
+								<div 
+									className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200"
+									role="alert"
+									aria-live="polite"
+								>
+									{error}
+								</div>
+							)}
+
+							<Button 
+								className="w-full" 
+								type="submit" 
+								disabled={isLoading}
+								aria-label={isLoading ? "Registrando..." : "Registrarse"}
+							>
+								{isLoading ? "Registrando..." : "Registrarse"}
+							</Button>
 						</form>
 					</Form>
-					<p className="text-center mt-3 font-light text-sm">¿Ya tienes una cuenta? <Link href="/login" className="font-bold ms-1 text-slate">Iniciar sesión</Link></p>
+					<p className="text-center mt-3 font-light text-sm">
+						¿Ya tienes una cuenta? 
+						<Link 
+							href="/login" 
+							className="font-bold ms-1 text-blue-600 hover:text-blue-800 underline"
+						>
+							Iniciar sesión
+						</Link>
+					</p>
 				</CardContent>
 			</Card>
 		</div>
-	)
-}
+	);
+});
+
+Register.displayName = 'Register';
+
+export default Register;

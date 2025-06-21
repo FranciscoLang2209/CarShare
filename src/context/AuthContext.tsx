@@ -1,36 +1,71 @@
-import React, { createContext, useEffect, useState } from "react";
-import Cookies from "js-cookie";
+'use client';
 
+import React, { createContext, useEffect, useState, useCallback, useMemo } from "react";
+import { AuthContextType } from "@/types";
+import { cookieService } from "@/services/cookies";
 
-type AuthContextType = {
-	user: string | null;
-	name: string | null;
-	setUser: (user: string) => void;
-	setName: (name: string) => void;
-}
-
-const defaultContext = {
+const defaultContext: AuthContextType = {
 	user: null,
 	name: null,
-	setName: (name: string) => { },
-	setUser: (user: string) => { }
-}
+	setName: () => {},
+	setUser: () => {},
+	logout: () => {},
+	isLoading: true,
+};
 
 export const AuthContext = createContext<AuthContextType>(defaultContext);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-	const [user, setUser] = useState<string | null>(null);
-	const [name, setName] = useState<string | null>(null);
+interface AuthProviderProps {
+	children: React.ReactNode;
+}
 
+export function AuthProvider({ children }: AuthProviderProps) {
+	const [user, setUserState] = useState<string | null>(null);
+	const [name, setNameState] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(true);
+
+	// Initialize auth state from cookies
 	useEffect(() => {
-		setName(Cookies.get("name") || null);
-		setUser(Cookies.get("user") || null);
-	}, [])
+		const storedName = cookieService.getName();
+		const storedUser = cookieService.getUser();
+		
+		setNameState(storedName);
+		setUserState(storedUser);
+		setIsLoading(false);
+	}, []);
+
+	const setUser = useCallback((userId: string) => {
+		setUserState(userId);
+		cookieService.setUser(userId);
+	}, []);
+
+	const setName = useCallback((userName: string) => {
+		setNameState(userName);
+		cookieService.setName(userName);
+	}, []);
+
+	const logout = useCallback(() => {
+		setUserState(null);
+		setNameState(null);
+		cookieService.clearAuth();
+	}, []);
+
+	const contextValue = useMemo(
+		(): AuthContextType => ({
+			user,
+			name,
+			setUser,
+			setName,
+			logout,
+			isLoading,
+		}),
+		[user, name, setUser, setName, logout, isLoading]
+	);
 
 	return (
-		<AuthContext.Provider value={{ user, setUser, name, setName }}>
+		<AuthContext.Provider value={contextValue}>
 			{children}
 		</AuthContext.Provider>
-	)
+	);
 }
 

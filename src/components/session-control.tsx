@@ -1,49 +1,64 @@
 "use client";
+
+import React, { memo } from 'react';
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
-import mqtt from "mqtt";
-import {useAuth} from "@/hooks/useAuth";
-import {useToast} from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useMqtt } from "@/hooks/useMqtt";
 
-export default function SessionControl() {
-	const client = mqtt.connect("ws://100.25.245.208:9001");
-	const { user} = useAuth();
-	const { toast } = useToast();
-
-	client.on("connect", () => {
-		console.log("Connected mqtt")
-	})
+const SessionControl = memo(() => {
+	const { user } = useAuth();
+	const { publishSessionStart, publishSessionStop, isConnected } = useMqtt();
 
 	const handleStart = () => {
-		if (!user) {
-			toast({ title: "Error", description: "No user logged in", variant: "destructive" });
-			return;
+		if (user) {
+			publishSessionStart(user);
 		}
-		client.publish("carshare/inel00/session/start", user);
-		toast({title: "Viaje iniciado", description: "El viaje ha sido iniciado"});
-	}
+	};
 
 	const handleStop = () => {
-		if (!user) {
-			toast({ title: "Error", description: "No user logged in", variant: "destructive" });
-			return;
+		if (user) {
+			publishSessionStop(user);
 		}
-		client.publish("carshare/inel00/session/stop", user);
-		toast({title: "Viaje finalizado", description: "El viaje ha sido terminado", variant: "destructive"});
-	}
-
+	};
 
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle>Viaje nuevo</CardTitle>
 			</CardHeader>
-			<CardContent>
-				<Button onClick={handleStart}>Iniciar</Button>
-			</CardContent>
-			<CardContent>
-				<Button onClick={handleStop}>Terminar</Button>
+			<CardContent className="space-y-3">
+				<Button 
+					onClick={handleStart}
+					disabled={!user || !isConnected}
+					className="w-full"
+					aria-label="Iniciar nuevo viaje"
+				>
+					Iniciar
+				</Button>
+				<Button 
+					onClick={handleStop}
+					disabled={!user || !isConnected}
+					variant="outline"
+					className="w-full"
+					aria-label="Terminar viaje actual"
+				>
+					Terminar
+				</Button>
+				{!isConnected && (
+					<p 
+						className="text-sm text-muted-foreground text-center"
+						role="status"
+						aria-label="Estado de conexión"
+					>
+						Sin conexión
+					</p>
+				)}
 			</CardContent>
 		</Card>
-	)
-}
+	);
+});
+
+SessionControl.displayName = 'SessionControl';
+
+export default SessionControl;

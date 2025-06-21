@@ -1,91 +1,125 @@
 "use client";
 
+import React, { memo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
-import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect, useState } from "react";
+import { useUserBalance } from "@/hooks/useUserBalance";
 import SessionControl from "./session-control";
+import { APP_CONFIG } from "@/constants/app";
+import { formatCurrency } from "@/lib/utils";
 
-export default function Stats() {
+const CarInfoCard = memo(() => (
+	<Card>
+		<CardHeader>
+			<CardTitle>{APP_CONFIG.CAR.MODEL}</CardTitle>
+			<CardContent className="flex mb-0">
+				<Image 
+					src="/corolla.png" 
+					width={300} 
+					height={300} 
+					alt={`Imagen del ${APP_CONFIG.CAR.MODEL}`}
+					priority
+				/>
+				<div className="flex flex-col gap-4">
+					<div className="flex flex-col gap-2">
+						<p className="font-bold text-2xl" aria-label="Consumo de combustible">
+							{APP_CONFIG.CAR.FUEL_CONSUMPTION}
+						</p>
+						<p className="font-light">Consumo (km/l)</p>
+					</div>
+					<div className="flex flex-col gap-2">
+						<p className="font-bold text-2xl" aria-label="Distancia total">
+							{APP_CONFIG.CAR.TOTAL_DISTANCE}
+						</p>
+						<p className="font-light">Distancia (km)</p>
+					</div>
+				</div>
+			</CardContent>
+		</CardHeader>
+	</Card>
+));
+
+CarInfoCard.displayName = 'CarInfoCard';
+
+const BalanceCard = memo(({ balance, isLoading }: { balance: number; isLoading: boolean }) => (
+	<Card>
+		<CardHeader>
+			<CardTitle>Balance</CardTitle>
+		</CardHeader>
+		<CardContent>
+			{isLoading ? (
+				<div 
+					className="font-bold text-2xl text-muted-foreground"
+					aria-label="Cargando balance"
+				>
+					Cargando...
+				</div>
+			) : (
+				<p 
+					className="font-bold text-red-700 text-2xl"
+					aria-label={`Balance negativo de ${formatCurrency(balance)}`}
+				>
+					- {formatCurrency(balance)}
+				</p>
+			)}
+		</CardContent>
+	</Card>
+));
+
+BalanceCard.displayName = 'BalanceCard';
+
+interface UserCardProps {
+	name: string | null;
+	onLogout: () => void;
+}
+
+const UserCard = memo(({ name, onLogout }: UserCardProps) => (
+	<Card>
+		<CardHeader>
+			<CardTitle>Usuario</CardTitle>
+		</CardHeader>
+		<CardContent className="flex items-center gap-3">
+			<p className="font-bold" aria-label={`Usuario actual: ${name}`}>
+				{name}
+			</p>
+			<Button 
+				variant="destructive" 
+				onClick={onLogout}
+				aria-label="Cerrar sesión"
+			>
+				Salir
+			</Button>
+		</CardContent>
+	</Card>
+));
+
+UserCard.displayName = 'UserCard';
+
+const Stats = memo(() => {
 	const router = useRouter();
-	const { user, name } = useAuth();
-	const [balance, setBalance] = useState(0);
+	const { user, name, logout } = useAuth();
+	const { balance, isLoading } = useUserBalance(user);
 
-	useEffect(() => {
-		const getBalance = async () => {
-			try {
-				const res = await fetch("http://localhost:3001/user/cost", {
-					method: "POST",
-					headers: {
-						"Content-Type": "application/json",
-					},
-					body: JSON.stringify({ user })
-				});
-				const data = await res.json();
-				setBalance(data.totalCost);
-				console.log(data)
-			} catch (err) {
-				console.error("Error", err)
-			}
-		}
-		getBalance();
-	}, [user])
+	const handleLogout = () => {
+		logout();
+		router.push("/login");
+	};
 
 	return (
 		<div className="flex flex-wrap gap-4 items-start">
-			<Card>
-				<CardHeader>
-					<CardTitle>
-						Toyota Corolla 2012
-					</CardTitle>
-					<CardContent className="flex mb-0">
-						<Image src="/corolla.png" width={300} height={300} alt="Auto corolla" />
-						<div className="flex flex-col gap-4">
-							<div className="flex flex-col gap-2">
-								<p className="font-bold text-2xl">11.5</p>
-								<p className="font-light">Consumo (km/l)</p>
-							</div>
-							<div className="flex flex-col gap-2">
-								<p className="font-bold text-2xl">1000</p>
-								<p className="font-light">Distancia (km)</p>
-							</div>
-						</div>
-					</CardContent>
-				</CardHeader>
-			</Card>
+			<CarInfoCard />
 			<div className="flex gap-3">
-				<Card>
-					<CardHeader>
-						<CardTitle>
-							Balance
-						</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<p className="font-bold text-red-700 text-2xl">
-							- ${balance.toFixed(0)}
-						</p>
-					</CardContent>
-				</Card>
-				<Card>
-					<CardHeader>
-						<CardTitle>Usuario</CardTitle>
-					</CardHeader>
-					<CardContent className="flex items-center gap-3">
-						<p className="font-bold">{name}</p>
-						<Button variant="destructive" onClick={() => {
-							Cookies.remove("name");
-							Cookies.remove("user");
-							router.push("/login")
-						}}>
-							Salir
-						</Button>
-					</CardContent>
-				</Card>
+				<BalanceCard balance={balance} isLoading={isLoading} />
+				<UserCard name={name} onLogout={handleLogout} />
 				<SessionControl />
 			</div>
 		</div>
-	)
-}
+	);
+});
+
+Stats.displayName = 'Stats';
+
+export default Stats;
