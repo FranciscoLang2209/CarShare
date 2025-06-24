@@ -133,21 +133,37 @@ export const useCars = () => {
         return true;
       }
 
+      // Make sure we have the user data
+      if (!user) {
+        console.error('❌ No user found for car creation');
+        toast({
+          title: "Error",
+          description: "Usuario no encontrado. Por favor, inicia sesión nuevamente.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       const dataWithAdmin = {
         ...carData,
-        admin: user,
+        admin: user, // This should be the user ID string
       };
 
+      console.log('🚗 Sending car data to backend:', dataWithAdmin);
+      console.log('🔍 User creating car:', user);
       const response = await carApi.createCar(dataWithAdmin);
       
       if (response.success) {
+        console.log('✅ Car created successfully:', response.data);
         toast({
           title: "Éxito",
           description: "Vehículo creado correctamente",
         });
-        await fetchCars(); // Refresh the cars list
+        // Force refresh the cars list to ensure the new car appears
+        await fetchCars(); 
         return true;
       } else {
+        console.error('❌ Error creating car:', response.error);
         toast({
           title: "Error",
           description: response.error || "Error al crear el vehículo",

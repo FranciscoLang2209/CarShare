@@ -58,5 +58,32 @@ export const TOAST_MESSAGES = {
       description: 'No se pudo conectar con el servidor',
       variant: 'destructive' as const,
     },
+    AUTH: {
+      INVALID_CREDENTIALS: {
+        title: 'Credenciales incorrectas',
+        description: 'Verifica tu email y contraseña',
+        variant: 'destructive' as const,
+      },
+      USER_EXISTS: {
+        title: 'Usuario ya existe',
+        description: 'Este email ya está registrado',
+        variant: 'destructive' as const,
+      },
+      INVALID_DATA: {
+        title: 'Datos inválidos',
+        description: 'Por favor, verifica la información ingresada',
+        variant: 'destructive' as const,
+      },
+      SESSION_EXPIRED: {
+        title: 'Sesión expirada',
+        description: 'Por favor, inicia sesión nuevamente',
+        variant: 'destructive' as const,
+      },
+    },
+    GENERIC: {
+      title: 'Error',
+      description: 'Ha ocurrido un error inesperado',
+      variant: 'destructive' as const,
+    },
   },
 } as const;

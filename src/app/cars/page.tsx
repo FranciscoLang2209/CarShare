@@ -24,6 +24,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { MultiSelect } from "@/components/ui/multi-select-simple";
 import { Car } from "@/types";
 import { getEfficiencyCategory, formatFuelEfficiency } from "@/lib/utils";
+import { toast } from "@/components/ui/use-toast";
 
 // Configuration Status Component
 const ConfigStatus = memo(({ demoMode, onDemoModeToggle }: { 
@@ -192,9 +193,25 @@ const AddCarForm = memo(() => {
 	});
 
 	const onSubmit = async (data: CarFormData) => {
+		console.log('📝 Form submitted with data:', data);
+		console.log('👤 Current user:', user);
+		
+		// Add client-side validation
+		if (!data.brand || !data.model) {
+			toast({
+				title: "Error",
+				description: "Marca y modelo son requeridos",
+				variant: "destructive",
+			});
+			return;
+		}
+
 		const success = await createCar(data);
 		if (success) {
+			console.log('✅ Car created successfully, resetting form');
 			form.reset();
+		} else {
+			console.log('❌ Failed to create car');
 		}
 	};
 
@@ -218,7 +235,16 @@ const AddCarForm = memo(() => {
 			</CardHeader>
 			<CardContent>
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+					<form 
+						onSubmit={form.handleSubmit(onSubmit)} 
+						className="space-y-6"
+						onKeyDown={(e) => {
+							// Prevent form submission on Enter key in input fields
+							if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
+								e.preventDefault();
+							}
+						}}
+					>
 						<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 							<FormField
 								control={form.control}

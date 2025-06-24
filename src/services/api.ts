@@ -26,12 +26,26 @@ async function apiRequest<T>(
 
     console.log(`📡 API Response status: ${response.status}`);
 
-    if (!response.ok) {
-      throw new ApiError(`HTTP error! status: ${response.status}`, response.status);
+    // Try to parse the response body regardless of status
+    let backendResponse;
+    try {
+      backendResponse = await response.json();
+      console.log(`📝 Backend response:`, backendResponse);
+    } catch (parseError) {
+      console.error('❌ Failed to parse response as JSON:', parseError);
+      backendResponse = { success: false, message: 'Invalid server response' };
     }
 
-    const backendResponse = await response.json();
-    console.log(`📝 Backend response:`, backendResponse);
+    if (!response.ok) {
+      // Extract meaningful error message from backend response
+      const errorMessage = getErrorMessage(response.status, backendResponse);
+      console.error(`❌ HTTP ${response.status} Error:`, errorMessage);
+      
+      return {
+        success: false,
+        error: errorMessage,
+      };
+    }
     
     // Handle the backend's wrapped response format
     if (backendResponse.success) {
@@ -44,10 +58,59 @@ async function apiRequest<T>(
     }
   } catch (error) {
     console.error(`❌ API Error - ${endpoint}:`, error);
+    
+    // Handle network errors
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      return {
+        success: false,
+        error: 'No se pudo conectar con el servidor. Verifica tu conexión a internet.',
+      };
+    }
+    
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred',
+      error: error instanceof Error ? error.message : 'Error desconocido',
     };
+  }
+}
+
+/**
+ * Extract user-friendly error messages based on HTTP status and backend response
+ */
+function getErrorMessage(status: number, backendResponse: any): string {
+  // First, try to get the message from the backend response
+  if (backendResponse?.message) {
+    return backendResponse.message;
+  }
+  
+  if (backendResponse?.error) {
+    return backendResponse.error;
+  }
+
+  // Fallback to status-based messages
+  switch (status) {
+    case 400:
+      return 'Datos inválidos. Por favor, verifica la información ingresada.';
+    case 401:
+      return 'Credenciales incorrectas. Verifica tu email y contraseña.';
+    case 403:
+      return 'No tienes permisos para realizar esta acción.';
+    case 404:
+      return 'Recurso no encontrado.';
+    case 409:
+      return 'Este email ya está registrado.';
+    case 422:
+      return 'Los datos proporcionados no son válidos.';
+    case 429:
+      return 'Demasiados intentos. Intenta de nuevo más tarde.';
+    case 500:
+      return 'Error interno del servidor. Intenta de nuevo más tarde.';
+    case 502:
+    case 503:
+    case 504:
+      return 'El servidor no está disponible. Intenta de nuevo más tarde.';
+    default:
+      return `Error del servidor (${status}). Intenta de nuevo más tarde.`;
   }
 }
 
