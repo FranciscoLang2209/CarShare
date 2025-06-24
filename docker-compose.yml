@@ -5,11 +5,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
     environment:
       - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://3.89.119.110:3001
     restart: always
-    network_mode: "host"
     volumes:
       - .:/app
       - /app/node_modules  # Evitar sobreescribir node_modules

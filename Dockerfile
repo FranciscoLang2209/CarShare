@@ -13,5 +13,5 @@ COPY . .
 # Expose port
 EXPOSE 3000
 
-# Run in development mode
-CMD ["npm", "run", "dev"]
+# Run in development mode with host binding
+CMD ["npm", "run", "dev", "--", "--hostname", "0.0.0.0"]
