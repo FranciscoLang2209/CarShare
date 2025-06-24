@@ -10,5 +10,5 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=http://3.89.119.110:3001
-    restart: unless-stopped
+    restart: always  # Cambiado a 'always' para mayor persistencia
     network_mode: "host"
