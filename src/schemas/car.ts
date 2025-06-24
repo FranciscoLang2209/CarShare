@@ -10,10 +10,11 @@ export const CarSchema = z.object({
   year: z.number()
     .min(1900, "El año debe ser mayor a 1900")
     .max(new Date().getFullYear() + 1, "El año no puede ser mayor al año actual"),
-  consumedFuel: z.number()
-    .min(0, "El combustible consumido no puede ser negativo")
+  fuelEfficiency: z.number()
+    .min(1, "La eficiencia de combustible debe ser mayor a 1 km/l")
+    .max(50, "La eficiencia de combustible no puede ser mayor a 50 km/l")
     .optional()
-    .default(0),
+    .default(11.5),
   users: z.array(z.string())
     .optional()
     .default([]),

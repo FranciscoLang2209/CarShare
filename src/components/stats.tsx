@@ -25,10 +25,10 @@ const CarInfoCard = memo(() => (
 				/>
 				<div className="flex flex-col gap-4">
 					<div className="flex flex-col gap-2">
-						<p className="font-bold text-2xl" aria-label="Consumo de combustible">
-							{APP_CONFIG.CAR.FUEL_CONSUMPTION}
+						<p className="font-bold text-2xl" aria-label="Eficiencia de combustible">
+							{APP_CONFIG.CAR.FUEL_EFFICIENCY}
 						</p>
-						<p className="font-light">Consumo (km/l)</p>
+						<p className="font-light">Eficiencia (km/l)</p>
 					</div>
 					<div className="flex flex-col gap-2">
 						<p className="font-bold text-2xl" aria-label="Distancia total">

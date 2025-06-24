@@ -9,7 +9,7 @@ export interface Car {
 	model: string;
 	brand: string;
 	year: number;
-	consumedFuel: number;
+	fuelEfficiency: number;
 	admin: User;
 	users: User[];
 }
@@ -18,7 +18,7 @@ export interface CreateCarData {
 	model: string;
 	brand: string;
 	year: number;
-	consumedFuel?: number;
+	fuelEfficiency?: number;
 	users: string[];
 }
 
@@ -28,6 +28,7 @@ export interface Session {
 	distance: number;
 	start_time: string;
 	end_time?: string;
+	car?: Car; // Optional car information for enhanced cost calculation
 }
 
 export interface AuthContextType {

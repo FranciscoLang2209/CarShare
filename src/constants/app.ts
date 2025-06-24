@@ -1,7 +1,8 @@
 export const APP_CONFIG = {
   CAR: {
     MODEL: 'Toyota Corolla 2012',
-    FUEL_CONSUMPTION: 11.5, // km/l
+    FUEL_EFFICIENCY: 11.5, // km/l (renamed from FUEL_CONSUMPTION for clarity)
+    FUEL_CONSUMPTION: 11.5, // km/l (kept for backward compatibility)
     TOTAL_DISTANCE: 1000, // km
     COST_PER_KM_FACTOR: 1013 / 11.5, // Cálculo del costo por km
   },

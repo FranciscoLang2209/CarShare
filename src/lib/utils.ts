@@ -15,13 +15,25 @@ export function formatDate(dateString: string): string {
 }
 
 /**
- * Calculate trip cost based on distance
+ * Calculate fuel consumption for a given distance and efficiency
+ * @param distance - Distance in kilometers
+ * @param fuelEfficiency - Fuel efficiency in km/l
+ * @returns Fuel consumption in liters
  */
-export function calculateTripCost(distance: number): number {
-  return (
-    (distance / APP_CONFIG.CAR.FUEL_CONSUMPTION) *
-    APP_CONFIG.CAR.COST_PER_KM_FACTOR
-  );
+export function calculateFuelConsumption(distance: number, fuelEfficiency: number): number {
+  return distance / fuelEfficiency;
+}
+
+/**
+ * Calculate trip cost based on distance and optional fuel efficiency
+ * @param distance - Distance in kilometers
+ * @param fuelEfficiency - Fuel efficiency in km/l (defaults to APP_CONFIG value)
+ * @returns Cost in CLP
+ */
+export function calculateTripCost(distance: number, fuelEfficiency?: number): number {
+  const efficiency = fuelEfficiency || APP_CONFIG.CAR.FUEL_CONSUMPTION;
+  const fuelPrice = 1013; // CLP per liter
+  return (distance / efficiency) * fuelPrice;
 }
 
 /**
@@ -29,6 +41,27 @@ export function calculateTripCost(distance: number): number {
  */
 export function formatCurrency(amount: number): string {
   return `$ ${amount.toFixed(2)}`;
+}
+
+/**
+ * Format fuel efficiency value with unit
+ * @param efficiency - Fuel efficiency in km/l
+ * @returns Formatted string with unit
+ */
+export function formatFuelEfficiency(efficiency: number): string {
+  return `${efficiency.toFixed(1)} km/l`;
+}
+
+/**
+ * Get efficiency category for display purposes
+ * @param efficiency - Fuel efficiency in km/l
+ * @returns Category string
+ */
+export function getEfficiencyCategory(efficiency: number): string {
+  if (efficiency >= 20) return 'Muy Eficiente';
+  if (efficiency >= 15) return 'Eficiente';
+  if (efficiency >= 10) return 'Normal';
+  return 'Poco Eficiente';
 }
 
 /**

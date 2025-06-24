@@ -92,33 +92,41 @@ const TripList = memo(() => {
 							<TableHead>Usuario</TableHead>
 							<TableHead className="hidden sm:table-cell">Distancia</TableHead>
 							<TableHead className="hidden md:table-cell">Fecha</TableHead>
-							<TableHead className="text-right">Total</TableHead>
+							<TableHead className="text-right">Costo</TableHead>
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{sessions.map((session, index) => (
-							<TableRow 
-								key={session.id || `session-${index}`} 
-								className={index % 2 === 0 ? "bg-accent" : ""}
-							>
-								<TableCell>
-									<span className="font-medium">
-										{session.user.name}
-									</span>
-								</TableCell>
-								<TableCell className="hidden sm:table-cell">
-									{session.distance} km
-								</TableCell>
-								<TableCell className="hidden md:table-cell">
-									<time dateTime={session.start_time}>
-										{formatDate(session.start_time)}
-									</time>
-								</TableCell>
-								<TableCell className="text-right font-semibold">
-									$ {calculateTripCost(session.distance).toFixed(2)}
-								</TableCell>
-							</TableRow>
-						))}
+						{sessions.map((session) => {
+							// Use car-specific fuel efficiency if available, otherwise use default
+							const fuelEfficiency = session.car?.fuelEfficiency;
+							const tripCost = calculateTripCost(session.distance, fuelEfficiency);
+							
+							return (
+								<TableRow key={session.id}>
+									<TableCell>
+										<span className="font-medium">
+											{session.user.name}
+										</span>
+									</TableCell>
+									<TableCell className="hidden sm:table-cell">
+										{session.distance} km
+									</TableCell>
+									<TableCell className="hidden md:table-cell">
+										<time dateTime={session.start_time}>
+											{formatDate(session.start_time)}
+										</time>
+									</TableCell>
+									<TableCell className="text-right font-semibold">
+										$ {tripCost.toFixed(2)}
+										{session.car && (
+											<div className="text-xs text-muted-foreground">
+												{session.car.brand} {session.car.model}
+											</div>
+										)}
+									</TableCell>
+								</TableRow>
+							);
+						})}
 					</TableBody>
 				</Table>
 			</CardContent>

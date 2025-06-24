@@ -16,13 +16,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Toaster } from "@/components/ui/toaster";
-import { CalendarDays, Car as CarIcon, Users, Fuel, Settings, ArrowLeft } from "lucide-react";
+import { CalendarDays, Car as CarIcon, Users, Fuel, Settings, ArrowLeft, TrendingUp } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { CarSchema, CarFormData } from "@/schemas/car";
 import { useCars } from "@/hooks/useCars";
 import { useAuth } from "@/hooks/useAuth";
 import { MultiSelect } from "@/components/ui/multi-select-simple";
 import { Car } from "@/types";
+import { getEfficiencyCategory, formatFuelEfficiency } from "@/lib/utils";
 
 // Configuration Status Component
 const ConfigStatus = memo(({ demoMode, onDemoModeToggle }: { 
@@ -118,8 +119,8 @@ const CarCard = memo(({ car, isAdmin }: { car: Car; isAdmin: boolean }) => (
 				<div className="flex items-center gap-2">
 					<Fuel className="h-4 w-4 text-muted-foreground" />
 					<div>
-						<p className="text-sm font-medium">{car.consumedFuel.toFixed(1)}L</p>
-						<p className="text-xs text-muted-foreground">Combustible</p>
+						<p className="text-sm font-medium">{formatFuelEfficiency(car.fuelEfficiency)}</p>
+						<p className="text-xs text-muted-foreground">Eficiencia</p>
 					</div>
 				</div>
 				<div className="flex items-center gap-2">
@@ -129,6 +130,17 @@ const CarCard = memo(({ car, isAdmin }: { car: Car; isAdmin: boolean }) => (
 						<p className="text-xs text-muted-foreground">Usuarios</p>
 					</div>
 				</div>
+			</div>
+			
+			{/* Efficiency Category Badge */}
+			<div className="flex items-center gap-2">
+				<TrendingUp className="h-4 w-4 text-muted-foreground" />
+				<Badge 
+					variant={car.fuelEfficiency >= 15 ? "default" : car.fuelEfficiency >= 10 ? "secondary" : "destructive"}
+					className="text-xs"
+				>
+					{getEfficiencyCategory(car.fuelEfficiency)}
+				</Badge>
 			</div>
 			
 			{!isAdmin && car.admin && (
@@ -174,7 +186,7 @@ const AddCarForm = memo(() => {
 			model: "",
 			brand: "",
 			year: new Date().getFullYear(),
-			consumedFuel: 0,
+			fuelEfficiency: 11.5,
 			users: [],
 		},
 	});
@@ -267,20 +279,25 @@ const AddCarForm = memo(() => {
 							/>
 							<FormField
 								control={form.control}
-								name="consumedFuel"
+								name="fuelEfficiency"
 								render={({ field }) => (
 									<FormItem>
-										<FormLabel>Combustible Inicial (L)</FormLabel>
+										<FormLabel>Eficiencia de Combustible (km/l)</FormLabel>
 										<FormControl>
 											<Input 
 												type="number"
-												min={0}
+												min={1}
+												max={50}
 												step={0.1}
+												placeholder="11.5"
 												{...field}
-												onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+												onChange={(e) => field.onChange(parseFloat(e.target.value) || 11.5)}
 												disabled={isCreating}
 											/>
 										</FormControl>
+										<p className="text-xs text-muted-foreground">
+											Kilómetros por litro. Típico: 8-15 km/l, Eficiente: 15+ km/l
+										</p>
 										<FormMessage />
 									</FormItem>
 								)}
