@@ -76,25 +76,40 @@ interface UserCardProps {
 	onLogout: () => void;
 }
 
-const UserCard = memo(({ name, onLogout }: UserCardProps) => (
-	<Card>
-		<CardHeader>
-			<CardTitle>Usuario</CardTitle>
-		</CardHeader>
-		<CardContent className="flex items-center gap-3">
-			<p className="font-bold" aria-label={`Usuario actual: ${name}`}>
-				{name}
-			</p>
-			<Button 
-				variant="destructive" 
-				onClick={onLogout}
-				aria-label="Cerrar sesión"
-			>
-				Salir
-			</Button>
-		</CardContent>
-	</Card>
-));
+const UserCard = memo(({ name, onLogout }: UserCardProps) => {
+	const router = useRouter();
+	
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Usuario</CardTitle>
+			</CardHeader>
+			<CardContent className="flex flex-col gap-3">
+				<p className="font-bold" aria-label={`Usuario actual: ${name}`}>
+					{name}
+				</p>
+				<div className="flex gap-2">
+					<Button 
+						variant="outline" 
+						size="sm"
+						onClick={() => router.push('/cars')}
+						aria-label="Ver mis vehículos"
+					>
+						Mis Vehículos
+					</Button>
+					<Button 
+						variant="destructive" 
+						size="sm"
+						onClick={onLogout}
+						aria-label="Cerrar sesión"
+					>
+						Salir
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
+	);
+});
 
 UserCard.displayName = 'UserCard';
 

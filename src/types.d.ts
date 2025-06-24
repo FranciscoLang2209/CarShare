@@ -4,6 +4,24 @@ export interface User {
 	email: string;
 }
 
+export interface Car {
+	id: string;
+	model: string;
+	brand: string;
+	year: number;
+	consumedFuel: number;
+	admin: User;
+	users: User[];
+}
+
+export interface CreateCarData {
+	model: string;
+	brand: string;
+	year: number;
+	consumedFuel?: number;
+	users: string[];
+}
+
 export interface Session {
 	id: string;
 	user: User;
