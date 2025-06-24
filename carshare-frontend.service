@@ -1,0 +1,14 @@
+[Unit]
+Description=CarShare Frontend Auto-Start
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/CarShare
+ExecStart=/home/ubuntu/CarShare/start-carshare.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

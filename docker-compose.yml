@@ -8,7 +8,10 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - NEXT_PUBLIC_API_URL=http://3.89.119.110:3001
-    restart: always  # Cambiado a 'always' para mayor persistencia
+    restart: always
     network_mode: "host"
+    volumes:
+      - .:/app
+      - /app/node_modules  # Evitar sobreescribir node_modules
