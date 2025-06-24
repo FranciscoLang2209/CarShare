@@ -45,7 +45,9 @@ export const useCars = () => {
   const [isDemoMode, setIsDemoMode] = useState(false);
 
   const fetchCars = useCallback(async () => {
-    if (!user) return;
+    if (!user) {
+      return;
+    }
 
     setIsLoading(true);
     setError(null);
@@ -65,24 +67,18 @@ export const useCars = () => {
         if (adminResponse.success) {
           setAdminCars(adminResponse.data || []);
         } else {
-          console.error('Error fetching admin cars:', adminResponse.error);
+          setAdminCars([]);
         }
 
         if (userResponse.success) {
           setUserCars(userResponse.data || []);
         } else {
-          console.error('Error fetching user cars:', userResponse.error);
+          setUserCars([]);
         }
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Error fetching cars';
       setError(errorMessage);
-      console.error('Error fetching cars:', err);
-      
-      // If there's a network error, suggest demo mode
-      if (err instanceof Error && (err.message.includes('fetch') || err.message.includes('NetworkError'))) {
-        console.log('💡 Network error detected. Consider enabling demo mode to see sample data.');
-      }
     } finally {
       setIsLoading(false);
     }
@@ -98,11 +94,9 @@ export const useCars = () => {
       const response = await carApi.getAllUsers();
       if (response.success) {
         setAllUsers(response.data || []);
-      } else {
-        console.error('Error fetching users:', response.error);
       }
     } catch (err) {
-      console.error('Error fetching users:', err);
+      // Silently fail for users fetch
     }
   }, [isDemoMode]);
 
@@ -135,7 +129,6 @@ export const useCars = () => {
 
       // Make sure we have the user data
       if (!user) {
-        console.error('❌ No user found for car creation');
         toast({
           title: "Error",
           description: "Usuario no encontrado. Por favor, inicia sesión nuevamente.",
@@ -146,24 +139,24 @@ export const useCars = () => {
 
       const dataWithAdmin = {
         ...carData,
-        admin: user, // This should be the user ID string
+        admin: user, // Ensure admin field is set to current user ID
       };
 
-      console.log('🚗 Sending car data to backend:', dataWithAdmin);
-      console.log('🔍 User creating car:', user);
       const response = await carApi.createCar(dataWithAdmin);
       
       if (response.success) {
-        console.log('✅ Car created successfully:', response.data);
         toast({
           title: "Éxito",
           description: "Vehículo creado correctamente",
         });
-        // Force refresh the cars list to ensure the new car appears
-        await fetchCars(); 
+        
+        // Add a small delay before refreshing to ensure backend has processed
+        setTimeout(async () => {
+          await fetchCars();
+        }, 500);
+        
         return true;
       } else {
-        console.error('❌ Error creating car:', response.error);
         toast({
           title: "Error",
           description: response.error || "Error al crear el vehículo",
@@ -181,6 +174,52 @@ export const useCars = () => {
       return false;
     } finally {
       setIsCreating(false);
+    }
+  }, [user, fetchCars, isDemoMode]);
+
+  const deleteCar = useCallback(async (carId: string) => {
+    if (!user) return false;
+
+    try {
+      if (isDemoMode) {
+        // Simulate car deletion in demo mode
+        toast({
+          title: "Demo Mode",
+          description: "Vehículo eliminado en modo demo",
+        });
+        
+        setAdminCars(prev => prev.filter(car => car.id !== carId));
+        setUserCars(prev => prev.filter(car => car.id !== carId));
+        return true;
+      }
+
+      const response = await carApi.deleteCar(carId, user);
+      
+      if (response.success) {
+        toast({
+          title: "Éxito",
+          description: "Vehículo eliminado correctamente",
+        });
+        
+        // Refresh cars after deletion
+        await fetchCars();
+        return true;
+      } else {
+        toast({
+          title: "Error",
+          description: response.error || "Error al eliminar el vehículo",
+          variant: "destructive",
+        });
+        return false;
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Error eliminando el vehículo';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      return false;
     }
   }, [user, fetchCars, isDemoMode]);
 
@@ -208,7 +247,9 @@ export const useCars = () => {
     isCreating,
     error,
     createCar,
+    deleteCar, // Expose deleteCar function
     refreshCars: fetchCars,
+    isDemoMode, // Add isDemoMode to the return object
     setIsDemoMode, // Expose setIsDemoMode to toggle demo mode
   };
 };

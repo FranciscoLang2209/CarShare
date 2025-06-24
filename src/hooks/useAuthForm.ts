@@ -24,7 +24,6 @@ export const useAuthForm = (): UseAuthFormReturn => {
 
     try {
       const response = await authApi.login(data.email, data.password);
-      console.log('🔍 Login response:', response);
       
       if (response.success && response.data) {
         // Try different ways to access the user data
@@ -33,12 +32,7 @@ export const useAuthForm = (): UseAuthFormReturn => {
         // Check if it's nested under 'user' key
         if ((response.data as any).user) {
           user = (response.data as any).user;
-          console.log('📝 Found user in nested structure');
         }
-        
-        console.log('👤 Login user data received:', user);
-        console.log('🆔 Login user ID:', (user as any)?.id);
-        console.log('📛 Login user name:', (user as any)?.name);
         
         if (user && (user as any).id) {
           setUser((user as any).id);
@@ -51,11 +45,9 @@ export const useAuthForm = (): UseAuthFormReturn => {
       } else {
         // The API service now provides user-friendly error messages
         const errorMessage = response.error || 'Error al iniciar sesión';
-        console.error('❌ Login failed:', errorMessage);
         setError(errorMessage);
       }
     } catch (err) {
-      console.error('❌ Login exception:', err);
       const errorMessage = err instanceof Error ? err.message : 'Error inesperado';
       setError(errorMessage);
     } finally {
@@ -69,10 +61,6 @@ export const useAuthForm = (): UseAuthFormReturn => {
 
     try {
       const response = await authApi.register(data.name, data.email, data.password);
-      console.log('🔍 Registration response:', response);
-      console.log('🔍 Registration response.data:', response.data);
-      console.log('🔍 Type of response.data:', typeof response.data);
-      console.log('🔍 Keys of response.data:', Object.keys(response.data || {}));
       
       if (response.success && response.data) {
         // Try different ways to access the user data
@@ -81,12 +69,7 @@ export const useAuthForm = (): UseAuthFormReturn => {
         // Check if it's nested under 'user' key
         if ((response.data as any).user) {
           user = (response.data as any).user;
-          console.log('📝 Found user in nested structure');
         }
-        
-        console.log('👤 User data received:', user);
-        console.log('🆔 User ID:', (user as any)?.id);
-        console.log('📛 User name:', (user as any)?.name);
         
         if (user && (user as any).id) {
           setUser((user as any).id);
@@ -99,11 +82,9 @@ export const useAuthForm = (): UseAuthFormReturn => {
       } else {
         // The API service now provides user-friendly error messages
         const errorMessage = response.error || 'Error al registrarse';
-        console.error('❌ Registration failed:', errorMessage);
         setError(errorMessage);
       }
     } catch (err) {
-      console.error('❌ Registration exception:', err);
       const errorMessage = err instanceof Error ? err.message : 'Error inesperado';
       setError(errorMessage);
     } finally {

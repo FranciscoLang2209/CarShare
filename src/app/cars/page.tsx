@@ -94,85 +94,98 @@ const ConfigStatus = memo(({ demoMode, onDemoModeToggle }: {
 ConfigStatus.displayName = 'ConfigStatus';
 
 // Car Card Component
-const CarCard = memo(({ car, isAdmin }: { car: Car; isAdmin: boolean }) => (
-	<Card className="w-full">
-		<CardHeader className="pb-3">
-			<div className="flex items-center justify-between">
-				<div className="flex items-center gap-3">
-					<CarIcon className="h-6 w-6 text-primary" />
-					<div>
-						<CardTitle className="text-lg">{car.brand} {car.model}</CardTitle>
-						<CardDescription className="flex items-center gap-1">
-							<CalendarDays className="h-4 w-4" />
-							{car.year}
-						</CardDescription>
+const CarCard = memo(({ car, isAdmin }: { car: Car; isAdmin: boolean }) => {
+	const router = useRouter();
+	
+	const handleViewSessions = () => {
+		router.push(`/cars/${car.id}`);
+	};
+
+	return (
+		<Card className="w-full">
+			<CardHeader className="pb-3">
+				<div className="flex items-center justify-between">
+					<div className="flex items-center gap-3">
+						<CarIcon className="h-6 w-6 text-primary" />
+						<div>
+							<CardTitle className="text-lg">{car.brand} {car.model}</CardTitle>
+							<CardDescription className="flex items-center gap-1">
+								<CalendarDays className="h-4 w-4" />
+								{car.year}
+							</CardDescription>
+						</div>
+					</div>
+					{isAdmin && (
+						<Badge variant="default" className="text-xs">
+							Administrador
+						</Badge>
+					)}
+				</div>
+			</CardHeader>
+			<CardContent className="space-y-4">
+				<div className="grid grid-cols-2 gap-4">
+					<div className="flex items-center gap-2">
+						<Fuel className="h-4 w-4 text-muted-foreground" />
+						<div>
+							<p className="text-sm font-medium">{formatFuelEfficiency(car.fuelEfficiency)}</p>
+							<p className="text-xs text-muted-foreground">Eficiencia</p>
+						</div>
+					</div>
+					<div className="flex items-center gap-2">
+						<Users className="h-4 w-4 text-muted-foreground" />
+						<div>
+							<p className="text-sm font-medium">{car.users.length}</p>
+							<p className="text-xs text-muted-foreground">Usuarios</p>
+						</div>
 					</div>
 				</div>
-				{isAdmin && (
-					<Badge variant="default" className="text-xs">
-						Administrador
+				
+				{/* Efficiency Category Badge */}
+				<div className="flex items-center gap-2">
+					<TrendingUp className="h-4 w-4 text-muted-foreground" />
+					<Badge 
+						variant={car.fuelEfficiency >= 15 ? "default" : car.fuelEfficiency >= 10 ? "secondary" : "destructive"}
+						className="text-xs"
+					>
+						{getEfficiencyCategory(car.fuelEfficiency)}
 					</Badge>
+				</div>
+				
+				{!isAdmin && car.admin && (
+					<div>
+						<p className="text-sm font-medium text-muted-foreground mb-1">Administrador:</p>
+						<Badge variant="outline">{car.admin.name}</Badge>
+					</div>
 				)}
-			</div>
-		</CardHeader>
-		<CardContent className="space-y-4">
-			<div className="grid grid-cols-2 gap-4">
-				<div className="flex items-center gap-2">
-					<Fuel className="h-4 w-4 text-muted-foreground" />
+				
+				{car.users.length > 0 && (
 					<div>
-						<p className="text-sm font-medium">{formatFuelEfficiency(car.fuelEfficiency)}</p>
-						<p className="text-xs text-muted-foreground">Eficiencia</p>
+						<p className="text-sm font-medium text-muted-foreground mb-2">Usuarios compartidos:</p>
+						<div className="flex flex-wrap gap-1">
+							{car.users.map((user) => (
+								<Badge key={user.id} variant="secondary" className="text-xs">
+									{user.name}
+								</Badge>
+							))}
+						</div>
 					</div>
+				)}
+				
+				<div className="flex gap-2 pt-2">
+					<Button 
+						variant="outline" 
+						size="sm" 
+						className="flex-1"
+						onClick={handleViewSessions}
+					>
+						<Settings className="h-4 w-4 mr-2" />
+						Ver Sesiones
+					</Button>
 				</div>
-				<div className="flex items-center gap-2">
-					<Users className="h-4 w-4 text-muted-foreground" />
-					<div>
-						<p className="text-sm font-medium">{car.users.length}</p>
-						<p className="text-xs text-muted-foreground">Usuarios</p>
-					</div>
-				</div>
-			</div>
-			
-			{/* Efficiency Category Badge */}
-			<div className="flex items-center gap-2">
-				<TrendingUp className="h-4 w-4 text-muted-foreground" />
-				<Badge 
-					variant={car.fuelEfficiency >= 15 ? "default" : car.fuelEfficiency >= 10 ? "secondary" : "destructive"}
-					className="text-xs"
-				>
-					{getEfficiencyCategory(car.fuelEfficiency)}
-				</Badge>
-			</div>
-			
-			{!isAdmin && car.admin && (
-				<div>
-					<p className="text-sm font-medium text-muted-foreground mb-1">Administrador:</p>
-					<Badge variant="outline">{car.admin.name}</Badge>
-				</div>
-			)}
-			
-			{car.users.length > 0 && (
-				<div>
-					<p className="text-sm font-medium text-muted-foreground mb-2">Usuarios compartidos:</p>
-					<div className="flex flex-wrap gap-1">
-						{car.users.map((user) => (
-							<Badge key={user.id} variant="secondary" className="text-xs">
-								{user.name}
-							</Badge>
-						))}
-					</div>
-				</div>
-			)}
-			
-			<div className="flex gap-2 pt-2">
-				<Button variant="outline" size="sm" className="flex-1">
-					<Settings className="h-4 w-4 mr-2" />
-					Ver Sesiones
-				</Button>
-			</div>
-		</CardContent>
-	</Card>
-));
+			</CardContent>
+		</Card>
+	);
+});
 
 CarCard.displayName = 'CarCard';
 
@@ -193,9 +206,6 @@ const AddCarForm = memo(() => {
 	});
 
 	const onSubmit = async (data: CarFormData) => {
-		console.log('📝 Form submitted with data:', data);
-		console.log('👤 Current user:', user);
-		
 		// Add client-side validation
 		if (!data.brand || !data.model) {
 			toast({
@@ -207,11 +217,13 @@ const AddCarForm = memo(() => {
 		}
 
 		const success = await createCar(data);
+		
 		if (success) {
-			console.log('✅ Car created successfully, resetting form');
 			form.reset();
-		} else {
-			console.log('❌ Failed to create car');
+			toast({
+				title: "¡Vehículo creado!",
+				description: "El vehículo se ha agregado correctamente. Revisa la lista arriba.",
+			});
 		}
 	};
 
@@ -379,21 +391,9 @@ const MyCarsPage = memo(() => {
 		setIsDemoMode(enabled);
 	};
 
-	// Debug logging
-	React.useEffect(() => {
-		console.log('🔍 MyCarsPage state:', {
-			user,
-			name,
-			adminCars: adminCars.length,
-			userCars: userCars.length,
-			isLoading,
-			error
-		});
-	}, [user, name, adminCars, userCars, isLoading, error]);
-
 	if (isLoading) {
 		return (
-			<main className="container mx-auto flex gap-5 mt-10 flex-col">
+			<main className="container mx-auto flex gap-5 pt-6 pb-10 flex-col px-4">
 				<div className="flex items-center gap-4">
 					<Button 
 						variant="outline" 
@@ -418,7 +418,7 @@ const MyCarsPage = memo(() => {
 
 	if (error) {
 		return (
-			<main className="container mx-auto flex gap-5 mt-10 flex-col">
+			<main className="container mx-auto flex gap-5 pt-6 pb-10 flex-col px-4">
 				<h1 className="text-3xl font-bold">Mis Vehículos</h1>
 				<Card>
 					<CardContent className="py-8">
@@ -438,7 +438,7 @@ const MyCarsPage = memo(() => {
 
 	return (
 		<main 
-			className="container mx-auto flex gap-5 mt-10 flex-col"
+			className="container mx-auto flex gap-5 pt-6 pb-10 flex-col px-4"
 			role="main"
 			aria-label="Página de mis vehículos"
 		>

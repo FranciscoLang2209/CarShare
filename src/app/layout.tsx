@@ -28,11 +28,11 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="es" className={inter.variable}>
-      <PageWrapper>
-        <body className={inter.className} suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
+        <PageWrapper>
           {children}
-        </body>
-      </PageWrapper>
+        </PageWrapper>
+      </body>
     </html>
   );
 }

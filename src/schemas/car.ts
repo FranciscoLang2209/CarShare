@@ -18,6 +18,7 @@ export const CarSchema = z.object({
     .default(11.5),
   users: z.array(z.string())
     .default([]),
+  admin: z.string().optional(), // Admin user ID - optional for form validation
 });
 
 export type CarFormData = z.infer<typeof CarSchema>;

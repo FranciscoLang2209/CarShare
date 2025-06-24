@@ -13,8 +13,6 @@ async function apiRequest<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
-  console.log(`🌐 API Request: ${options.method || 'GET'} ${endpoint}`);
-  
   try {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       headers: {
@@ -24,22 +22,17 @@ async function apiRequest<T>(
       ...options,
     });
 
-    console.log(`📡 API Response status: ${response.status}`);
-
     // Try to parse the response body regardless of status
     let backendResponse;
     try {
       backendResponse = await response.json();
-      console.log(`📝 Backend response:`, backendResponse);
     } catch (parseError) {
-      console.error('❌ Failed to parse response as JSON:', parseError);
       backendResponse = { success: false, message: 'Invalid server response' };
     }
 
     if (!response.ok) {
       // Extract meaningful error message from backend response
       const errorMessage = getErrorMessage(response.status, backendResponse);
-      console.error(`❌ HTTP ${response.status} Error:`, errorMessage);
       
       return {
         success: false,
@@ -57,8 +50,6 @@ async function apiRequest<T>(
       };
     }
   } catch (error) {
-    console.error(`❌ API Error - ${endpoint}:`, error);
-    
     // Handle network errors
     if (error instanceof TypeError && error.message.includes('fetch')) {
       return {
@@ -137,41 +128,84 @@ export const sessionApi = {
     });
   },
 
+  async getSessionsByCar(carId: string): Promise<ApiResponse<Session[]>> {
+    if (!carId) {
+      return { success: false, error: 'Car ID is required' };
+    }
+    return apiRequest<Session[]>(`/car/${encodeURIComponent(carId)}/sessions`, {
+      cache: 'no-store',
+    });
+  },
+
   async getUserCost(userId: string): Promise<ApiResponse<StatsData>> {
     return apiRequest<StatsData>('/user/cost', {
       method: 'POST',
       body: JSON.stringify({ user: userId }),
     });
   },
+
+  async getCarCost(carId: string): Promise<ApiResponse<StatsData>> {
+    if (!carId) {
+      return { success: false, error: 'Car ID is required' };
+    }
+    return apiRequest<StatsData>('/car/cost', {
+      method: 'POST',
+      body: JSON.stringify({ car: carId }),
+    });
+  },
 };
 
 export const carApi = {
   async getCarsByAdmin(adminId: string): Promise<ApiResponse<Car[]>> {
-    console.log('🚗 Fetching cars by admin:', adminId);
-    return apiRequest<Car[]>(`/car/admin/${adminId}`, {
+    if (!adminId) {
+      return { success: false, error: 'Admin ID is required' };
+    }
+    return apiRequest<Car[]>(`/car/admin/${encodeURIComponent(adminId)}`, {
       cache: 'no-store',
     });
   },
 
   async getCarsByUser(userId: string): Promise<ApiResponse<Car[]>> {
-    console.log('👤 Fetching cars by user:', userId);
-    return apiRequest<Car[]>(`/car/user/${userId}`, {
+    if (!userId) {
+      return { success: false, error: 'User ID is required' };
+    }
+    return apiRequest<Car[]>(`/car/user/${encodeURIComponent(userId)}`, {
       cache: 'no-store',
     });
   },
 
   async getAllUsers(): Promise<ApiResponse<User[]>> {
-    console.log('👥 Fetching all users');
     return apiRequest<User[]>('/car/users', {
       cache: 'no-store',
     });
   },
 
   async createCar(carData: CreateCarData): Promise<ApiResponse<Car>> {
-    console.log('🚗 Creating car:', carData);
     return apiRequest<Car>('/car', {
       method: 'POST',
       body: JSON.stringify(carData),
+    });
+  },
+
+  async getCarById(carId: string): Promise<ApiResponse<Car>> {
+    if (!carId) {
+      return { success: false, error: 'Car ID is required' };
+    }
+    return apiRequest<Car>(`/car/${encodeURIComponent(carId)}`, {
+      cache: 'no-store',
+    });
+  },
+
+  async deleteCar(carId: string, adminId: string): Promise<ApiResponse<void>> {
+    if (!carId) {
+      return { success: false, error: 'Car ID is required' };
+    }
+    if (!adminId) {
+      return { success: false, error: 'Admin ID is required' };
+    }
+    return apiRequest<void>(`/car/${encodeURIComponent(carId)}/admin`, {
+      method: 'DELETE',
+      body: JSON.stringify({ adminId }),
     });
   },
 };

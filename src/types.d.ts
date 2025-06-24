@@ -20,6 +20,7 @@ export interface CreateCarData {
 	year: number;
 	fuelEfficiency?: number;
 	users: string[];
+	admin?: string; // Admin user ID - will be set automatically
 }
 
 export interface Session {

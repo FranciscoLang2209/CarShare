@@ -2,6 +2,7 @@
 
 import React, { memo } from "react";
 import { AuthProvider } from "@/context/AuthContext";
+import Header from "./header";
 
 interface PageWrapperProps {
 	children: React.ReactNode;
@@ -10,7 +11,12 @@ interface PageWrapperProps {
 const PageWrapper = memo(({ children }: PageWrapperProps) => {
 	return (
 		<AuthProvider>
-			{children}
+			<div className="min-h-screen bg-gray-50">
+				<Header />
+				<main className="pt-20">
+					{children}
+				</main>
+			</div>
 		</AuthProvider>
 	);
 });
