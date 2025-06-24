@@ -7,7 +7,7 @@ module.exports = {
     env: {
       NODE_ENV: 'production',
       PORT: 3000,
-      NEXT_PUBLIC_API_URL: 'http://3.89.119.110:3001'
+      NEXT_PUBLIC_API_URL: 'http://98.84.196.99:3001'
     },
     instances: 1,
     autorestart: true,
