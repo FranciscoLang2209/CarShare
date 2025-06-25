@@ -12,13 +12,16 @@ import { Car, Session, StatsData } from "@/types";
 import { formatFuelEfficiency, getEfficiencyCategory, calculateTripCost } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import { useBackendHealth } from "@/hooks/useBackendHealth";
+import SessionControl from "@/components/session-control";
+import { useActiveSession } from "@/hooks/useActiveSession";
 
 export default function CarDetailPage() {
 	const params = useParams();
 	const router = useRouter();
+	const carId = params.id as string;
 	const { user, name } = useAuth();
 	const { isBackendConnected, isMqttConnected } = useBackendHealth();
-	const carId = params.id as string;
+	const { activeSession, isLoading: activeSessionLoading } = useActiveSession(carId);
 
 	const [car, setCar] = useState<Car | null>(null);
 	const [sessions, setSessions] = useState<Session[]>([]);
@@ -295,6 +298,40 @@ export default function CarDetailPage() {
 										</p>
 									)}
 								</div>
+							</div>
+						</div>
+					</Card>
+					
+					{/* Session Control Card */}
+					<Card className="p-6">
+						<div className="text-center space-y-4">
+							<h3 className="text-lg font-semibold">Control de Viaje</h3>
+							
+							{/* Active Session Info */}
+							{activeSession && (
+								<div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+									<p className="text-sm font-medium text-blue-800 mb-1">
+										🚗 Viaje en progreso
+									</p>
+									<p className="text-xs text-blue-600">
+										Iniciado: {new Date(activeSession.start_time).toLocaleString('es-ES')}
+									</p>
+									<p className="text-xs text-blue-600">
+										Distancia: {activeSession.distance.toFixed(2)} km
+									</p>
+								</div>
+							)}
+							
+							{!activeSession && !activeSessionLoading && (
+								<div className="mb-4 p-3 bg-gray-50 rounded-lg">
+									<p className="text-sm text-gray-600">
+										No hay viajes activos
+									</p>
+								</div>
+							)}
+							
+							<div className="max-w-sm mx-auto">
+								<SessionControl />
 							</div>
 						</div>
 					</Card>

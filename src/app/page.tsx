@@ -33,7 +33,6 @@ import { MultiSelect } from "@/components/ui/multi-select-simple";
 import { Car } from "@/types";
 import { getEfficiencyCategory, formatFuelEfficiency } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
-import Stats from "@/components/stats";
 
 // Delete Confirmation Dialog Component
 const DeleteCarDialog = memo(({ 
@@ -451,9 +450,6 @@ export default function HomePage() {
 			<div className="flex items-center justify-between">
 				<h1 className="text-3xl font-bold">Mis Vehículos</h1>
 			</div>
-
-			{/* Stats and Session Control */}
-			<Stats />
 
 			{error && (
 				<Card>
