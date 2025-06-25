@@ -255,53 +255,6 @@ export default function CarDetailPage() {
 
 				{/* Right column - Stats and info */}
 				<div className="lg:col-span-2 space-y-6">
-					{/* Trip status card */}
-					<Card className="p-6">
-						<div className="text-center space-y-4">
-							<h3 className="text-lg font-semibold">Estado del Sistema</h3>
-							<div className="space-y-3">
-								{/* Backend Connection Status */}
-								<div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-									<span className="text-sm font-medium">Servidor:</span>
-									<div className="flex items-center gap-2">
-										<div className={`w-2 h-2 rounded-full ${
-											isBackendConnected ? 'bg-green-500' : 'bg-red-500'
-										}`} />
-										<span className="text-sm">
-											{isBackendConnected ? 'Conectado' : 'Sin conexión'}
-										</span>
-									</div>
-								</div>
-								
-								{/* MQTT Connection Status */}
-								<div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-									<span className="text-sm font-medium">MQTT:</span>
-									<div className="flex items-center gap-2">
-										<div className={`w-2 h-2 rounded-full ${
-											isMqttConnected ? 'bg-green-500' : 'bg-red-500'
-										}`} />
-										<span className="text-sm">
-											{isMqttConnected ? 'Conectado' : 'Desconectado'}
-										</span>
-									</div>
-								</div>
-								
-								{/* Overall Status */}
-								<div className="pt-2">
-									{isBackendConnected && isMqttConnected ? (
-										<p className="text-sm text-green-600 font-medium">
-											✅ Sistema funcionando correctamente
-										</p>
-									) : (
-										<p className="text-sm text-red-600 font-medium">
-											⚠️ {!isBackendConnected ? 'Servidor no disponible' : 'Sistema sin datos GPS'}
-										</p>
-									)}
-								</div>
-							</div>
-						</div>
-					</Card>
-					
 					{/* Session Control Card */}
 					<Card className="p-6">
 						<div className="text-center space-y-4">
