@@ -259,23 +259,78 @@ export const sessionApi = {
   },
 };
 
+/**
+ * Parse MongoDB string representations in car data
+ */
+function parseCarData(rawCar: any): Car {
+  if (!rawCar) return rawCar;
+  
+  const car = { ...rawCar };
+  
+  // Parse admin field if it's a string
+  if (typeof car.admin === 'string') {
+    try {
+      const cleanStr = car.admin.replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
+                                .replace(/(\w+):/g, '"$1":');
+      car.admin = JSON.parse(cleanStr);
+    } catch (e) {
+      console.error('Error parsing car admin data:', e);
+    }
+  }
+  
+  // Parse users array if elements are strings
+  if (Array.isArray(car.users)) {
+    car.users = car.users.map((user: any) => {
+      if (typeof user === 'string') {
+        try {
+          const cleanStr = user.replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
+                               .replace(/(\w+):/g, '"$1":');
+          return JSON.parse(cleanStr);
+        } catch (e) {
+          console.error('Error parsing car user data:', e);
+          return user;
+        }
+      }
+      return user;
+    });
+  }
+  
+  return car;
+}
+
 export const carApi = {
   async getCarsByAdmin(adminId: string): Promise<ApiResponse<Car[]>> {
     if (!adminId) {
       return { success: false, error: 'Admin ID is required' };
     }
-    return apiRequest<Car[]>(`/car/admin/${encodeURIComponent(adminId)}`, {
+    
+    const response = await apiRequest<Car[]>(`/car/admin/${encodeURIComponent(adminId)}`, {
       cache: 'no-store',
     });
+    
+    // Parse each car's data if successful
+    if (response.success && response.data) {
+      response.data = response.data.map(parseCarData);
+    }
+    
+    return response;
   },
 
   async getCarsByUser(userId: string): Promise<ApiResponse<Car[]>> {
     if (!userId) {
       return { success: false, error: 'User ID is required' };
     }
-    return apiRequest<Car[]>(`/car/user/${encodeURIComponent(userId)}`, {
+    
+    const response = await apiRequest<Car[]>(`/car/user/${encodeURIComponent(userId)}`, {
       cache: 'no-store',
     });
+    
+    // Parse each car's data if successful
+    if (response.success && response.data) {
+      response.data = response.data.map(parseCarData);
+    }
+    
+    return response;
   },
 
   async getAllUsers(): Promise<ApiResponse<User[]>> {
@@ -285,19 +340,34 @@ export const carApi = {
   },
 
   async createCar(carData: CreateCarData): Promise<ApiResponse<Car>> {
-    return apiRequest<Car>('/car', {
+    const response = await apiRequest<Car>('/car', {
       method: 'POST',
       body: JSON.stringify(carData),
     });
+    
+    // Parse the car data if successful
+    if (response.success && response.data) {
+      response.data = parseCarData(response.data);
+    }
+    
+    return response;
   },
 
   async getCarById(carId: string): Promise<ApiResponse<Car>> {
     if (!carId) {
       return { success: false, error: 'Car ID is required' };
     }
-    return apiRequest<Car>(`/car/${encodeURIComponent(carId)}`, {
+    
+    const response = await apiRequest<Car>(`/car/${encodeURIComponent(carId)}`, {
       cache: 'no-store',
     });
+    
+    // Parse the car data if successful
+    if (response.success && response.data) {
+      response.data = parseCarData(response.data);
+    }
+    
+    return response;
   },
 
   async deleteCar(carId: string, adminId: string): Promise<ApiResponse<void>> {
