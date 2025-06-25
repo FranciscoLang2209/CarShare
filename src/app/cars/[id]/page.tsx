@@ -140,10 +140,7 @@ export default function CarDetailPage() {
 		};
 	}, [sessions, car]);
 
-	console.log('🔍 Estado actual - isLoading:', isLoading, 'error:', error, 'car:', !!car);
-
 	if (isLoading) {
-		console.log('⏳ Mostrando pantalla de carga...');
 		return (
 			<main className="container mx-auto flex gap-5 pt-6 pb-10 flex-col px-4">
 				<h1 className="text-3xl font-bold">Cargando...</h1>
@@ -159,7 +156,6 @@ export default function CarDetailPage() {
 	}
 
 	if (error || !car) {
-		console.log('❌ Mostrando pantalla de error...');
 		return (
 			<main className="container mx-auto flex gap-5 pt-6 pb-10 flex-col px-4">
 				<h1 className="text-3xl font-bold">Error</h1>
@@ -257,9 +253,8 @@ export default function CarDetailPage() {
 										<p className="text-sm font-medium text-gray-600 mb-2">
 											Usuarios Compartidos ({car.users.length})
 										</p>
-										<div className="flex flex-wrap gap-1">
-											{car.users.map((user) => (
-												<Badge key={user.id} variant="secondary" className="text-xs">
+										<div className="flex flex-wrap gap-1">										{car.users.map((user, index) => (
+											<Badge key={user.id || `user-${index}`} variant="secondary" className="text-xs">
 													{user.name}
 												</Badge>
 											))}
@@ -374,9 +369,8 @@ export default function CarDetailPage() {
 					</CardHeader>
 					<CardContent>
 						{sessions.length > 0 ? (
-							<div className="space-y-4">
-								{sessions.map((session) => (
-									<Card key={session.id} className="border-l-4 border-l-blue-500">
+							<div className="space-y-4">							{sessions.map((session, index) => (
+								<Card key={session.id || `session-${index}`} className="border-l-4 border-l-blue-500">
 										<CardContent className="p-4">
 											<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
 												<div>
