@@ -20,6 +20,7 @@ const DEMO_CARS: Car[] = [
     brand: 'Toyota',
     year: 2023,
     fuelEfficiency: 15.2,
+    fuelType: 'Nafta Premium',
     admin: DEMO_USERS[0],
     users: [DEMO_USERS[1], DEMO_USERS[2]],
   },
@@ -29,6 +30,7 @@ const DEMO_CARS: Car[] = [
     brand: 'Honda',
     year: 2022,
     fuelEfficiency: 13.8,
+    fuelType: 'Nafta Super',
     admin: DEMO_USERS[1],
     users: [DEMO_USERS[0]],
   },
@@ -119,6 +121,7 @@ export const useCars = () => {
           brand: carData.brand,
           year: carData.year,
           fuelEfficiency: carData.fuelEfficiency || 11.5,
+          fuelType: carData.fuelType,
           admin: DEMO_USERS.find(u => u.id === user) || DEMO_USERS[0],
           users: carData.users.map(userId => DEMO_USERS.find(u => u.id === userId)).filter(Boolean) as User[],
         };

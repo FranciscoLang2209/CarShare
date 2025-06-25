@@ -371,15 +371,31 @@ const AddCarForm = memo(() => {
 						</div>
 
 						{/* Tipo de combustible */}
+						<div className="w-full p-4 bg-yellow-200 border-4 border-yellow-600 rounded-lg">
+							<h3 className="text-lg font-bold text-yellow-800">🚨 TEST COMPONENT 🚨</h3>
+							<p>Si ves esto, el lugar del componente está bien</p>
+						</div>
+						
+						{/* Test directo del slider */}
+						<FuelTypeSlider
+							value="Nafta Super"
+							onChange={(value) => console.log('Direct test:', value)}
+							error="Test error"
+						/>
+						
 						<FormField
 							control={form.control}
 							name="fuelType"
 							render={({ field }) => (
 								<FormItem>
+									<div className="w-full p-4 bg-green-200 border-4 border-green-600 rounded-lg">
+										<h3 className="text-lg font-bold text-green-800">🔧 FORM FIELD TEST 🔧</h3>
+										<p>Field value: {field.value}</p>
+									</div>
 									<FuelTypeSlider
 										value={field.value || 'Nafta Super'}
 										onChange={(value) => {
-											console.log('FuelType changed:', value);
+											console.log('🚗 FuelType changed:', value);
 											field.onChange(value);
 										}}
 										error={form.formState.errors.fuelType?.message}
