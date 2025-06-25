@@ -371,35 +371,29 @@ const AddCarForm = memo(() => {
 						</div>
 
 						{/* Tipo de combustible */}
-						<div className="w-full p-4 bg-yellow-200 border-4 border-yellow-600 rounded-lg">
-							<h3 className="text-lg font-bold text-yellow-800">🚨 TEST COMPONENT 🚨</h3>
-							<p>Si ves esto, el lugar del componente está bien</p>
-						</div>
-						
-						{/* Test directo del slider */}
-						<FuelTypeSlider
-							value="Nafta Super"
-							onChange={(value) => console.log('Direct test:', value)}
-							error="Test error"
-						/>
-						
 						<FormField
 							control={form.control}
 							name="fuelType"
 							render={({ field }) => (
 								<FormItem>
-									<div className="w-full p-4 bg-green-200 border-4 border-green-600 rounded-lg">
-										<h3 className="text-lg font-bold text-green-800">🔧 FORM FIELD TEST 🔧</h3>
-										<p>Field value: {field.value}</p>
-									</div>
-									<FuelTypeSlider
-										value={field.value || 'Nafta Super'}
-										onChange={(value) => {
-											console.log('🚗 FuelType changed:', value);
-											field.onChange(value);
-										}}
-										error={form.formState.errors.fuelType?.message}
-									/>
+									<FormLabel>Tipo de Combustible *</FormLabel>
+									<FormControl>
+										<div className="space-y-2">
+											<select
+												value={field.value || 'Nafta Super'}
+												onChange={(e) => field.onChange(e.target.value)}
+												className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+												disabled={isCreating}
+											>
+												<option value="Nafta Super">Nafta Super - $1,200 ARS/L</option>
+												<option value="Nafta Premium">Nafta Premium - $1,400 ARS/L</option>
+												<option value="Diesel">Diesel - $1,250 ARS/L</option>
+											</select>
+											<p className="text-xs text-gray-500">
+												Precios de referencia en Pesos Argentinos (ARS) por litro
+											</p>
+										</div>
+									</FormControl>
 									<FormMessage />
 								</FormItem>
 							)}
