@@ -265,20 +265,29 @@ export const sessionApi = {
 function parseCarData(rawCar: any): Car {
   if (!rawCar) return rawCar;
   
-  console.log('🔍 parseCarData - Raw car data:', rawCar);
-  console.log('🆔 parseCarData - Original car ID:', rawCar.id, 'length:', rawCar.id?.length);
-  
   const car = { ...rawCar };
   
   // Parse admin field if it's a string
   if (typeof car.admin === 'string') {
     try {
-      const cleanStr = car.admin.replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
-                                .replace(/(\w+):/g, '"$1":');
-      car.admin = JSON.parse(cleanStr);
-      console.log('✅ parseCarData - Admin parsed successfully');
+      // More robust cleaning: handle both single and double quotes
+      let cleanStr = car.admin
+        // Replace ObjectId() wrappers
+        .replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
+        .replace(/ObjectId\('([^']+)'\)/g, '"$1"')
+        // Replace single quotes with double quotes, being careful with property names
+        .replace(/(\w+):\s*'([^']*?)'/g, '"$1": "$2"')
+        // Replace unquoted property names
+        .replace(/(\w+):/g, '"$1":')
+        // Handle remaining single quotes
+        .replace(/'/g, '"');
+      
+      // Try to parse, if it fails, the data might already be an object
+      const parsed = JSON.parse(cleanStr);
+      car.admin = parsed;
     } catch (e) {
-      console.error('❌ Error parsing car admin data:', e);
+      console.warn('Could not parse admin data, keeping as string:', car.admin);
+      // Keep as string if parsing fails
     }
   }
   
@@ -287,21 +296,27 @@ function parseCarData(rawCar: any): Car {
     car.users = car.users.map((user: any) => {
       if (typeof user === 'string') {
         try {
-          const cleanStr = user.replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
-                               .replace(/(\w+):/g, '"$1":');
+          // More robust cleaning for user data
+          let cleanStr = user
+            // Replace ObjectId() wrappers
+            .replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
+            .replace(/ObjectId\('([^']+)'\)/g, '"$1"')
+            // Replace single quotes with double quotes, being careful with property names
+            .replace(/(\w+):\s*'([^']*?)'/g, '"$1": "$2"')
+            // Replace unquoted property names
+            .replace(/(\w+):/g, '"$1":')
+            // Handle remaining single quotes
+            .replace(/'/g, '"');
+          
           return JSON.parse(cleanStr);
         } catch (e) {
-          console.error('Error parsing car user data:', e);
+          console.warn('Could not parse user data, keeping as string:', user);
           return user;
         }
       }
       return user;
     });
-    console.log('✅ parseCarData - Users parsed successfully');
   }
-  
-  console.log('🔍 parseCarData - Final car data:', car);
-  console.log('🆔 parseCarData - Final car ID:', car.id, 'length:', car.id?.length);
   
   return car;
 }

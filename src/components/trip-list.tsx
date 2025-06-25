@@ -96,7 +96,7 @@ const TripList = memo(() => {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{sessions.map((session) => {
+						{sessions.map((session, index) => {
 							console.log('🚗 Session data:', session);
 							console.log('🗓️ Start time:', session.start_time, 'type:', typeof session.start_time);
 							console.log('🗓️ End time:', session.end_time, 'type:', typeof session.end_time);
@@ -106,7 +106,7 @@ const TripList = memo(() => {
 							const tripCost = calculateTripCost(session.distance, fuelEfficiency);
 							
 							return (
-								<TableRow key={session.id}>
+								<TableRow key={session.id || `session-${index}`}>
 									<TableCell>
 										<span className="font-medium">
 											{session.user.name}

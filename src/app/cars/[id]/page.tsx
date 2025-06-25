@@ -19,10 +19,8 @@ export default function CarDetailPage() {
 	const params = useParams();
 	const router = useRouter();
 	const carId = params.id as string;
-	console.log('🆔 CarId extraído de params:', carId, 'params completos:', params);
 	
 	const { user, name } = useAuth();
-	console.log('👤 Usuario en CarDetailPage:', user);
 	
 	const { isBackendConnected, isMqttConnected } = useBackendHealth();
 	const { activeSession, isLoading: activeSessionLoading } = useActiveSession(carId);
