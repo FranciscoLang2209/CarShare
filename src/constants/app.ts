@@ -6,6 +6,24 @@ export const APP_CONFIG = {
     TOTAL_DISTANCE: 1000, // km
     COST_PER_KM_FACTOR: 1013 / 11.5, // Cálculo del costo por km
   },
+  FUEL: {
+    TYPES: {
+      NAFTA_SUPER: 'Nafta Super',
+      NAFTA_PREMIUM: 'Nafta Premium',
+      DIESEL: 'Diesel',
+    },
+    PRICES_ARS: {
+      'Nafta Super': 1200,
+      'Nafta Premium': 1400,
+      'Diesel': 1250,
+    },
+    DEFAULT_TYPE: 'Nafta Super',
+  },
+  CURRENCY: {
+    CODE: 'ARS',
+    SYMBOL: '$',
+    NAME: 'Peso Argentino',
+  },
   MQTT: {
     BROKER_URL: 'ws://100.25.245.208:9001',
     TOPICS: {

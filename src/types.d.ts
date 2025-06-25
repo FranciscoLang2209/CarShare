@@ -10,6 +10,7 @@ export interface Car {
 	brand: string;
 	year: number;
 	fuelEfficiency: number;
+	fuelType: 'Nafta Super' | 'Nafta Premium' | 'Diesel'; // NUEVO CAMPO OBLIGATORIO
 	admin: User;
 	users: User[];
 }
@@ -19,6 +20,7 @@ export interface CreateCarData {
 	brand: string;
 	year: number;
 	fuelEfficiency?: number;
+	fuelType: 'Nafta Super' | 'Nafta Premium' | 'Diesel'; // NUEVO CAMPO OBLIGATORIO
 	users: string[];
 	admin?: string; // Admin user ID - will be set automatically
 }
@@ -54,4 +56,5 @@ export interface StatsData {
 	totalCost: number;
 	totalDistance: number;
 	fuelConsumption: number;
+	currency?: 'ARS'; // Cambiar de CLP a ARS
 }

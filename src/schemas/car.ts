@@ -16,6 +16,10 @@ export const CarSchema = z.object({
     .min(1, "La eficiencia de combustible debe ser mayor a 1 km/l")
     .max(50, "La eficiencia de combustible no puede ser mayor a 50 km/l")
     .default(11.5),
+  fuelType: z.enum(['Nafta Super', 'Nafta Premium', 'Diesel'], {
+    required_error: "El tipo de combustible es obligatorio",
+    invalid_type_error: "Tipo de combustible inválido"
+  }).default('Nafta Super'),
   users: z.array(z.string())
     .default([]),
   admin: z.string().optional(), // Admin user ID - optional for form validation

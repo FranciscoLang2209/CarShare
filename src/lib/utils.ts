@@ -49,22 +49,24 @@ export function calculateFuelConsumption(distance: number, fuelEfficiency: numbe
 }
 
 /**
- * Calculate trip cost based on distance and optional fuel efficiency
+ * Calculate trip cost based on distance, fuel efficiency, and fuel type
  * @param distance - Distance in kilometers
  * @param fuelEfficiency - Fuel efficiency in km/l (defaults to APP_CONFIG value)
- * @returns Cost in CLP
+ * @param fuelType - Type of fuel (defaults to 'Nafta Super')
+ * @returns Cost in ARS
  */
-export function calculateTripCost(distance: number, fuelEfficiency?: number): number {
+export function calculateTripCost(distance: number, fuelEfficiency?: number, fuelType?: string): number {
   const efficiency = fuelEfficiency || APP_CONFIG.CAR.FUEL_CONSUMPTION;
-  const fuelPrice = 1013; // CLP per liter
+  const fuel = fuelType || APP_CONFIG.FUEL.DEFAULT_TYPE;
+  const fuelPrice = APP_CONFIG.FUEL.PRICES_ARS[fuel as keyof typeof APP_CONFIG.FUEL.PRICES_ARS] || 1200; // ARS per liter
   return (distance / efficiency) * fuelPrice;
 }
 
 /**
- * Format currency value
+ * Format currency value in ARS
  */
 export function formatCurrency(amount: number): string {
-  return `$ ${amount.toFixed(2)}`;
+  return `$ ${amount.toFixed(2)} ARS`;
 }
 
 /**

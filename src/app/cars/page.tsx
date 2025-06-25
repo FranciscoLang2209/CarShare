@@ -22,6 +22,7 @@ import { CarSchema, CarFormData } from "@/schemas/car";
 import { useCars } from "@/hooks/useCars";
 import { useAuth } from "@/hooks/useAuth";
 import { MultiSelect } from "@/components/ui/multi-select-simple";
+import { FuelTypeSlider } from "@/components/ui/fuel-type-slider";
 import { Car } from "@/types";
 import { getEfficiencyCategory, formatFuelEfficiency } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
@@ -157,6 +158,15 @@ const CarCard = memo(({ car, isAdmin }: { car: Car; isAdmin: boolean }) => {
 					</div>
 				</div>
 				
+				{/* Tipo de combustible */}
+				<div className="flex items-center gap-2">
+					<Fuel className="h-4 w-4 text-muted-foreground" />
+					<div>
+						<p className="text-sm font-medium">{car.fuelType || 'Nafta Super'}</p>
+						<p className="text-xs text-muted-foreground">Combustible</p>
+					</div>
+				</div>
+				
 				{/* Efficiency Category Badge */}
 				<div className="flex items-center gap-2">
 					<TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -218,6 +228,7 @@ const AddCarForm = memo(() => {
 			brand: "",
 			year: new Date().getFullYear(),
 			fuelEfficiency: 11.5,
+			fuelType: 'Nafta Super',
 			users: [],
 		},
 	});
@@ -358,6 +369,22 @@ const AddCarForm = memo(() => {
 								)}
 							/>
 						</div>
+
+						{/* Tipo de combustible */}
+						<FormField
+							control={form.control}
+							name="fuelType"
+							render={({ field }) => (
+								<FormItem>
+									<FuelTypeSlider
+										value={field.value}
+										onChange={field.onChange}
+										error={form.formState.errors.fuelType?.message}
+									/>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
 						<FormField
 							control={form.control}

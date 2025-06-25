@@ -97,6 +97,17 @@ const CarInfoCard = memo(() => {
 						</div>
 					</div>
 					
+					{/* Tipo de combustible */}
+					<div className="flex items-center gap-3">
+						<Fuel className="h-5 w-5 text-muted-foreground" />
+						<div>
+							<p className="font-bold text-lg" aria-label="Tipo de combustible">
+								{displayCar.fuelType || 'Nafta Super'}
+							</p>
+							<p className="font-light text-sm">Combustible</p>
+						</div>
+					</div>
+					
 					{allCars.length > 1 && (
 						<div className="flex items-center gap-3">
 							<CarIcon className="h-5 w-5 text-muted-foreground" />

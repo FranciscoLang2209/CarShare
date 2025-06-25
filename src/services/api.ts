@@ -237,23 +237,31 @@ export const sessionApi = {
   },
 
   async getUserCost(userId: string): Promise<ApiResponse<StatsData>> {
-    return apiRequest<StatsData>('/user/cost', {
+    const response = await apiRequest<StatsData>('/user/cost', {
       method: 'POST',
       body: JSON.stringify({ user: userId }),
     });
+    
+    // Asegurar que la moneda sea ARS
+    if (response.success && response.data) {
+      response.data.currency = 'ARS';
+    }
+    
+    return response;
   },
 
   async getCarCost(carId: string): Promise<ApiResponse<StatsData>> {
     if (!carId) {
       return { success: false, error: 'Car ID is required' };
     }
-    // Backend doesn't have car-specific cost endpoint, return empty data
+    // Backend no tiene endpoint específico para costo de auto, retornar datos vacíos
     return { 
       success: true, 
       data: { 
         totalDistance: 0, 
         totalCost: 0, 
-        fuelConsumption: 0
+        fuelConsumption: 0,
+        currency: 'ARS' // Cambiar a ARS
       } 
     };
   },
@@ -363,6 +371,16 @@ export const carApi = {
   },
 
   async createCar(carData: CreateCarData): Promise<ApiResponse<Car>> {
+    // Validar que fuelType esté presente y sea válido
+    if (!carData.fuelType) {
+      return { success: false, error: 'El tipo de combustible es obligatorio' };
+    }
+    
+    const validFuelTypes = ['Nafta Super', 'Nafta Premium', 'Diesel'];
+    if (!validFuelTypes.includes(carData.fuelType)) {
+      return { success: false, error: 'Tipo de combustible inválido' };
+    }
+
     const response = await apiRequest<Car>('/car', {
       method: 'POST',
       body: JSON.stringify(carData),

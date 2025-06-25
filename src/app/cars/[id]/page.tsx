@@ -242,7 +242,14 @@ export default function CarDetailPage() {
 										<p className="text-lg font-semibold">{formatFuelEfficiency(car.fuelEfficiency)}</p>
 									</div>
 									<div>
-										<p className="text-sm text-gray-600">Distancia (km)</p>
+										<p className="text-sm text-gray-600">Tipo de combustible</p>
+										<p className="text-lg font-semibold">{car.fuelType || 'Nafta Super'}</p>
+									</div>
+								</div>
+								
+								<div className="grid grid-cols-1 gap-4">
+									<div>
+										<p className="text-sm text-gray-600">Distancia total (km)</p>
 										<p className="text-lg font-semibold">{carStats.totalDistance.toFixed(0)}</p>
 									</div>
 								</div>
