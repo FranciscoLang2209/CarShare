@@ -11,11 +11,13 @@ import { carApi, sessionApi } from "@/services/api";
 import { Car, Session, StatsData } from "@/types";
 import { formatFuelEfficiency, getEfficiencyCategory, calculateTripCost } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
+import { useBackendHealth } from "@/hooks/useBackendHealth";
 
 export default function CarDetailPage() {
 	const params = useParams();
 	const router = useRouter();
 	const { user, name } = useAuth();
+	const { isBackendConnected, isMqttConnected } = useBackendHealth();
 	const carId = params.id as string;
 
 	const [car, setCar] = useState<Car | null>(null);
@@ -253,16 +255,46 @@ export default function CarDetailPage() {
 					{/* Trip status card */}
 					<Card className="p-6">
 						<div className="text-center space-y-4">
-							<h3 className="text-lg font-semibold">Estado del Viaje</h3>
-							<div className="space-y-2">
-								<Button 
-									className="w-full" 
-									disabled
-									variant="secondary"
-								>
-									Ver Detalles
-								</Button>
-								<p className="text-sm text-gray-500">Sin conexión</p>
+							<h3 className="text-lg font-semibold">Estado del Sistema</h3>
+							<div className="space-y-3">
+								{/* Backend Connection Status */}
+								<div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+									<span className="text-sm font-medium">Servidor:</span>
+									<div className="flex items-center gap-2">
+										<div className={`w-2 h-2 rounded-full ${
+											isBackendConnected ? 'bg-green-500' : 'bg-red-500'
+										}`} />
+										<span className="text-sm">
+											{isBackendConnected ? 'Conectado' : 'Sin conexión'}
+										</span>
+									</div>
+								</div>
+								
+								{/* MQTT Connection Status */}
+								<div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+									<span className="text-sm font-medium">MQTT:</span>
+									<div className="flex items-center gap-2">
+										<div className={`w-2 h-2 rounded-full ${
+											isMqttConnected ? 'bg-green-500' : 'bg-red-500'
+										}`} />
+										<span className="text-sm">
+											{isMqttConnected ? 'Conectado' : 'Desconectado'}
+										</span>
+									</div>
+								</div>
+								
+								{/* Overall Status */}
+								<div className="pt-2">
+									{isBackendConnected && isMqttConnected ? (
+										<p className="text-sm text-green-600 font-medium">
+											✅ Sistema funcionando correctamente
+										</p>
+									) : (
+										<p className="text-sm text-red-600 font-medium">
+											⚠️ {!isBackendConnected ? 'Servidor no disponible' : 'Sistema sin datos GPS'}
+										</p>
+									)}
+								</div>
 							</div>
 						</div>
 					</Card>

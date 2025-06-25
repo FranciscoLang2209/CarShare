@@ -25,34 +25,56 @@ import { MultiSelect } from "@/components/ui/multi-select-simple";
 import { Car } from "@/types";
 import { getEfficiencyCategory, formatFuelEfficiency } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
+import { useBackendHealth } from "@/hooks/useBackendHealth";
 
 // Configuration Status Component
 const ConfigStatus = memo(({ demoMode, onDemoModeToggle }: { 
 	demoMode: boolean; 
 	onDemoModeToggle: (enabled: boolean) => void; 
 }) => {
-	const [backendStatus, setBackendStatus] = React.useState<'checking' | 'online' | 'offline'>('checking');
+	const { isBackendConnected, isMqttConnected, isLoading } = useBackendHealth();
 
-	React.useEffect(() => {
+	const getStatusInfo = () => {
 		if (demoMode) {
-			setBackendStatus('offline');
-			return;
+			return {
+				color: 'bg-blue-500',
+				text: 'Modo Demo',
+				description: 'Usando datos simulados'
+			};
 		}
-
-		const checkBackend = async () => {
-			try {
-				const response = await fetch(process.env.NEXT_PUBLIC_API_URL + '/health', {
-					method: 'GET',
-					cache: 'no-store',
-				});
-				setBackendStatus(response.ok ? 'online' : 'offline');
-			} catch {
-				setBackendStatus('offline');
-			}
+		
+		if (isLoading) {
+			return {
+				color: 'bg-yellow-500',
+				text: 'Verificando...',
+				description: 'Comprobando estado del servidor'
+			};
+		}
+		
+		if (!isBackendConnected) {
+			return {
+				color: 'bg-red-500',
+				text: 'Sin conexión',
+				description: 'No se puede conectar al servidor'
+			};
+		}
+		
+		if (!isMqttConnected) {
+			return {
+				color: 'bg-orange-500',
+				text: 'MQTT desconectado',
+				description: 'El servidor no está conectado al broker MQTT'
+			};
+		}
+		
+		return {
+			color: 'bg-green-500',
+			text: 'Conectado',
+			description: 'Servidor y MQTT funcionando correctamente'
 		};
+	};
 
-		checkBackend();
-	}, [demoMode]);
+	const statusInfo = getStatusInfo();
 
 	return (
 		<Card className="mb-4">
@@ -60,17 +82,12 @@ const ConfigStatus = memo(({ demoMode, onDemoModeToggle }: {
 				<div className="flex items-center justify-between">
 					<div className="flex items-center gap-3 text-sm">
 						<div className="flex items-center gap-2">
-							<div className={`w-2 h-2 rounded-full ${
-								demoMode ? 'bg-blue-500' :
-								backendStatus === 'online' ? 'bg-green-500' : 
-								backendStatus === 'offline' ? 'bg-red-500' : 'bg-yellow-500'
-							}`} />
+							<div className={`w-2 h-2 rounded-full ${statusInfo.color}`} />
 							<span>Estado:</span>
-							<span className="font-medium">
-								{demoMode ? 'Modo Demo' :
-								 backendStatus === 'checking' ? 'Verificando...' : 
-								 backendStatus === 'online' ? 'Conectado' : 'Sin conexión'}
-							</span>
+							<span className="font-medium">{statusInfo.text}</span>
+						</div>
+						<div className="text-muted-foreground">
+							{statusInfo.description}
 						</div>
 						<div className="text-muted-foreground">
 							API: {process.env.NEXT_PUBLIC_API_URL}

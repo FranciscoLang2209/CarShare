@@ -5,10 +5,12 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useMqtt } from "@/hooks/useMqtt";
+import { useBackendHealth } from "@/hooks/useBackendHealth";
 
 const SessionControl = memo(() => {
 	const { user } = useAuth();
-	const { publishSessionStart, publishSessionStop, isConnected } = useMqtt();
+	const { publishSessionStart, publishSessionStop } = useMqtt();
+	const { isMqttConnected, isBackendConnected } = useBackendHealth();
 
 	const handleStart = () => {
 		if (user) {
@@ -22,6 +24,19 @@ const SessionControl = memo(() => {
 		}
 	};
 
+	// Both backend and MQTT need to be connected for trips to work
+	const canStartTrip = user && isBackendConnected && isMqttConnected;
+	
+	const getConnectionStatus = () => {
+		if (!isBackendConnected) {
+			return "Sin conexión al servidor";
+		}
+		if (!isMqttConnected) {
+			return "Sin conexión MQTT";
+		}
+		return null;
+	};
+
 	return (
 		<Card>
 			<CardHeader>
@@ -30,7 +45,7 @@ const SessionControl = memo(() => {
 			<CardContent className="space-y-3">
 				<Button 
 					onClick={handleStart}
-					disabled={!user || !isConnected}
+					disabled={!canStartTrip}
 					className="w-full"
 					aria-label="Iniciar nuevo viaje"
 				>
@@ -38,20 +53,20 @@ const SessionControl = memo(() => {
 				</Button>
 				<Button 
 					onClick={handleStop}
-					disabled={!user || !isConnected}
+					disabled={!canStartTrip}
 					variant="outline"
 					className="w-full"
 					aria-label="Terminar viaje actual"
 				>
 					Terminar
 				</Button>
-				{!isConnected && (
+				{getConnectionStatus() && (
 					<p 
 						className="text-sm text-muted-foreground text-center"
 						role="status"
 						aria-label="Estado de conexión"
 					>
-						Sin conexión
+						{getConnectionStatus()}
 					</p>
 				)}
 			</CardContent>
