@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +19,11 @@ export default function CarDetailPage() {
 	const params = useParams();
 	const router = useRouter();
 	const carId = params.id as string;
+	console.log('🆔 CarId extraído de params:', carId, 'params completos:', params);
+	
 	const { user, name } = useAuth();
+	console.log('👤 Usuario en CarDetailPage:', user);
+	
 	const { isBackendConnected, isMqttConnected } = useBackendHealth();
 	const { activeSession, isLoading: activeSessionLoading } = useActiveSession(carId);
 
@@ -32,16 +36,26 @@ export default function CarDetailPage() {
 	useEffect(() => {
 		if (!carId || !user) return;
 
+		console.log('🚗 Iniciando carga de datos del vehículo:', carId);
+		console.log('👤 Usuario:', user);
+
 		const fetchCarData = async () => {
 			setIsLoading(true);
 			setError(null);
 
 			try {
+				console.log('📞 Llamando a carApi.getCarById...');
 				// Fetch car details
 				const carResponse = await carApi.getCarById(carId);
+				console.log('🚗 Respuesta del car:', carResponse);
+				
 				if (carResponse.success && carResponse.data) {
-					setCar(carResponse.data);
+					// Parse the car data to handle string-formatted admin and users
+					const parsedCar = parseCarData(carResponse.data);
+					setCar(parsedCar);
+					console.log('✅ Car cargado y parseado exitosamente:', parsedCar);
 				} else {
+					console.error('❌ Error cargando car:', carResponse.error);
 					setError('No se pudo cargar la información del vehículo');
 					return;
 				}
@@ -94,8 +108,10 @@ export default function CarDetailPage() {
 				}
 
 			} catch (err) {
+				console.error('❌ Error general al cargar datos:', err);
 				setError('Error al cargar los datos del vehículo');
 			} finally {
+				console.log('🏁 Finalizando carga, setIsLoading(false)');
 				setIsLoading(false);
 			}
 		};
@@ -104,7 +120,7 @@ export default function CarDetailPage() {
 	}, [carId, user]);
 
 	// Calculate car-specific stats
-	const carStats = React.useMemo(() => {
+	const carStats = useMemo(() => {
 		if (!sessions.length || !car) {
 			return {
 				totalCost: 0,
@@ -126,7 +142,10 @@ export default function CarDetailPage() {
 		};
 	}, [sessions, car]);
 
+	console.log('🔍 Estado actual - isLoading:', isLoading, 'error:', error, 'car:', !!car);
+
 	if (isLoading) {
+		console.log('⏳ Mostrando pantalla de carga...');
 		return (
 			<main className="container mx-auto flex gap-5 pt-6 pb-10 flex-col px-4">
 				<h1 className="text-3xl font-bold">Cargando...</h1>
@@ -142,6 +161,7 @@ export default function CarDetailPage() {
 	}
 
 	if (error || !car) {
+		console.log('❌ Mostrando pantalla de error...');
 		return (
 			<main className="container mx-auto flex gap-5 pt-6 pb-10 flex-col px-4">
 				<h1 className="text-3xl font-bold">Error</h1>

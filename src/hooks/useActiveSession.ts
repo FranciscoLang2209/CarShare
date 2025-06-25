@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { sessionApi } from '@/services/api';
 import { Session } from '@/types';
+import { useAuth } from './useAuth';
 
 interface UseActiveSessionReturn {
   activeSession: Session | null;
@@ -13,9 +14,10 @@ export const useActiveSession = (carId?: string): UseActiveSessionReturn => {
   const [activeSession, setActiveSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const fetchActiveSession = useCallback(async () => {
-    if (!carId) {
+    if (!user) {
       setActiveSession(null);
       setIsLoading(false);
       return;
@@ -25,38 +27,33 @@ export const useActiveSession = (carId?: string): UseActiveSessionReturn => {
     setError(null);
     
     try {
-      const response = await sessionApi.getSessionsByCar(carId);
+      console.log('🔍 Buscando sesión activa para userId:', user);
       
-      if (response.success && response.data) {
-        // Look for active session (one without end_time)
-        const activeSessions = response.data.filter(session => !session.end_time);
-        
-        if (activeSessions.length > 0) {
-          // If there are multiple active sessions, take the most recent one
-          const mostRecent = activeSessions.sort((a, b) => 
-            new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
-          )[0];
-          setActiveSession(mostRecent);
-        } else {
-          setActiveSession(null);
-        }
+      // Get active session for the current user
+      const response = await sessionApi.getActiveSessions(user);
+      
+      if (response.success) {
+        setActiveSession(response.data || null);
+        console.log('✅ Sesión activa encontrada:', response.data);
       } else {
         setActiveSession(null);
-        setError(response.error || 'Failed to fetch sessions');
+        console.log('ℹ️ No hay sesiones activas');
+        setError(response.error || 'Failed to fetch active session');
       }
     } catch (err) {
+      console.error('❌ Error al buscar sesión activa:', err);
       setError(err instanceof Error ? err.message : 'Unknown error occurred');
       setActiveSession(null);
     } finally {
       setIsLoading(false);
     }
-  }, [carId]);
+  }, [user]);
 
   useEffect(() => {
     fetchActiveSession();
     
-    // Set up interval to check for active sessions every 15 seconds
-    const interval = setInterval(fetchActiveSession, 15000);
+    // Set up interval to check for active sessions every 10 seconds
+    const interval = setInterval(fetchActiveSession, 10000);
     
     return () => clearInterval(interval);
   }, [fetchActiveSession]);

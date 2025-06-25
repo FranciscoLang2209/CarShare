@@ -172,17 +172,46 @@ export const sessionApi = {
     if (!carId) {
       return { success: false, error: 'Car ID is required' };
     }
-    // Backend doesn't have car-specific sessions endpoint, use general sessions and filter
+    
     try {
+      // Try the specific endpoint first
+      const directResponse = await apiRequest<Session[]>(`/user/sessions/car/${encodeURIComponent(carId)}`, {
+        cache: 'no-store',
+      });
+      
+      if (directResponse.success) {
+        return directResponse;
+      }
+      
+      // Fallback: get all sessions and filter by carId
       const allSessionsResponse = await this.getSessions();
       if (allSessionsResponse.success && allSessionsResponse.data) {
         const carSessions = allSessionsResponse.data.filter(session => {
-          // Handle both string ID and Car object cases
-          const sessionCarId = typeof session.car === 'string' ? session.car : session.car?.id;
+          if (!session.car) return false;
+          
+          // Handle car field that comes as JSON string from backend
+          let carData;
+          if (typeof session.car === 'string') {
+            try {
+              // Parse the string representation of the MongoDB object
+              const cleanStr = (session.car as string).replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
+                                          .replace(/(\w+):/g, '"$1":');
+              carData = JSON.parse(cleanStr);
+            } catch (e) {
+              console.error('Error parsing car data:', e);
+              return false;
+            }
+          } else {
+            carData = session.car;
+          }
+          
+          const sessionCarId = carData?._id || carData?.id;
           return sessionCarId === carId;
         });
+        
         return { success: true, data: carSessions };
       }
+      
       return { success: false, error: 'Failed to fetch sessions' };
     } catch (error) {
       return { success: false, error: 'Failed to fetch car sessions' };

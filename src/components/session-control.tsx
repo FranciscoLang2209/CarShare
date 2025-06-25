@@ -16,8 +16,11 @@ const SessionControl = memo(({ carId }: SessionControlProps) => {
 	const { publishSessionStart, publishSessionStop } = useMqtt();
 	const { isMqttConnected, isBackendConnected } = useBackendHealth();
 
+	console.log('🎛️ SessionControl recibió carId:', carId, 'user:', user);
+
 	const handleStart = async () => {
 		if (user) {
+			console.log('🚀 Iniciando sesión con userId:', user, 'carId:', carId);
 			await publishSessionStart(user, carId);
 		}
 	};
