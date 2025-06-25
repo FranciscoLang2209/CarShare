@@ -9,7 +9,7 @@ import { ArrowLeft, Car as CarIcon, Fuel, Users, DollarSign, Route, Clock } from
 import { useAuth } from "@/hooks/useAuth";
 import { carApi, sessionApi } from "@/services/api";
 import { Car, Session, StatsData } from "@/types";
-import { formatFuelEfficiency, getEfficiencyCategory, calculateTripCost } from "@/lib/utils";
+import { formatFuelEfficiency, getEfficiencyCategory, calculateTripCost, formatDate } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import { useBackendHealth } from "@/hooks/useBackendHealth";
 import SessionControl from "@/components/session-control";
@@ -60,23 +60,31 @@ export default function CarDetailPage() {
 
 				// Fetch sessions for this car
 				try {
+					console.log('📊 Fetching sessions for carId:', carId);
 					// Try the car-specific endpoint first
 					const carSessionsResponse = await sessionApi.getSessionsByCar(carId);
+					console.log('📊 Car sessions response:', carSessionsResponse);
 					if (carSessionsResponse.success && carSessionsResponse.data) {
+						console.log('✅ Sessions loaded:', carSessionsResponse.data.length, 'sessions');
 						setSessions(carSessionsResponse.data);
 					} else {
+						console.log('⚠️ Car-specific endpoint failed, trying fallback...');
 						// Fallback to general sessions and filter
 						const sessionsResponse = await sessionApi.getSessions();
+						console.log('📊 General sessions response:', sessionsResponse);
 						if (sessionsResponse.success && sessionsResponse.data) {
 							const carSessions = sessionsResponse.data.filter(session => 
 								session.car?.id === carId
 							);
+							console.log('🔍 Filtered sessions for car:', carSessions.length, 'sessions');
 							setSessions(carSessions);
 						}
 					}
 				} catch (sessionError) {
+					console.log('❌ Error fetching car sessions:', sessionError);
 					// If car-specific endpoint fails, try the general one
 					const sessionsResponse = await sessionApi.getSessions();
+					console.log('📊 Fallback general sessions response:', sessionsResponse);
 					if (sessionsResponse.success && sessionsResponse.data) {
 						const carSessions = sessionsResponse.data.filter(session => 
 							session.car?.id === carId
@@ -369,7 +377,12 @@ export default function CarDetailPage() {
 					</CardHeader>
 					<CardContent>
 						{sessions.length > 0 ? (
-							<div className="space-y-4">							{sessions.map((session, index) => (
+							<div className="space-y-4">							{sessions.map((session, index) => {
+								console.log('🚗 Session data:', session);
+								console.log('🗓️ Start time:', session.start_time, 'type:', typeof session.start_time);
+								console.log('🗓️ End time:', session.end_time, 'type:', typeof session.end_time);
+								
+								return (
 								<Card key={session.id || `session-${index}`} className="border-l-4 border-l-blue-500">
 										<CardContent className="p-4">
 											<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -390,13 +403,14 @@ export default function CarDetailPage() {
 												<div>
 													<p className="text-sm text-muted-foreground">Fecha</p>
 													<p className="font-medium">
-														{new Date(session.start_time).toLocaleDateString()}
+														{formatDate(session.start_time)}
 													</p>
 												</div>
 											</div>
 										</CardContent>
 									</Card>
-								))}
+								);
+							})}
 							</div>
 						) : (
 							<div className="text-center py-8 text-muted-foreground">
