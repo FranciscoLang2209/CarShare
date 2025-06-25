@@ -97,6 +97,10 @@ const TripList = memo(() => {
 					</TableHeader>
 					<TableBody>
 						{sessions.map((session) => {
+							console.log('🚗 Session data:', session);
+							console.log('🗓️ Start time:', session.start_time, 'type:', typeof session.start_time);
+							console.log('🗓️ End time:', session.end_time, 'type:', typeof session.end_time);
+							
 							// Use car-specific fuel efficiency if available, otherwise use default
 							const fuelEfficiency = session.car?.fuelEfficiency;
 							const tripCost = calculateTripCost(session.distance, fuelEfficiency);

@@ -11,7 +11,31 @@ export function cn(...inputs: ClassValue[]) {
  * Format a date string to DD-MM-YYYY format
  */
 export function formatDate(dateString: string): string {
-  return dayjs(dateString).format("DD-MM-YYYY");
+  console.log('🗓️ formatDate - Original dateString:', dateString, 'type:', typeof dateString);
+  
+  if (!dateString || dateString === null || dateString === undefined) {
+    console.log('❌ formatDate - Empty or null date');
+    return 'Invalid Date';
+  }
+  
+  const parsed = dayjs(dateString);
+  console.log('🗓️ formatDate - Parsed date valid?', parsed.isValid());
+  
+  if (!parsed.isValid()) {
+    console.log('❌ formatDate - Invalid date, trying alternative parsing');
+    // Try parsing as ISO date if it's not working
+    const isoTry = new Date(dateString);
+    if (!isNaN(isoTry.getTime())) {
+      const result = dayjs(isoTry).format("DD-MM-YYYY");
+      console.log('✅ formatDate - Alternative parsing successful:', result);
+      return result;
+    }
+    return 'Invalid Date';
+  }
+  
+  const result = parsed.format("DD-MM-YYYY");
+  console.log('✅ formatDate - Final result:', result);
+  return result;
 }
 
 /**
