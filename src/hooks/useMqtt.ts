@@ -11,38 +11,6 @@ interface UseMqttReturn {
 
 export const useMqtt = (): UseMqttReturn => {
   const { toast } = useToast();
-  const clientRef = useRef(mqttService.connect(APP_CONFIG.MQTT.BROKER_URL));
-  const isConnectedRef = useRef(false);
-
-  useEffect(() => {
-    const client = clientRef.current;
-
-    const handleConnect = () => {
-      isConnectedRef.current = true;
-      console.log('Connected to MQTT broker');
-    };
-
-    const handleError = (error: Error) => {
-      console.error('MQTT error:', error);
-      isConnectedRef.current = false;
-    };
-
-    const handleClose = () => {
-      isConnectedRef.current = false;
-      console.log('MQTT connection closed');
-    };
-
-    client.on('connect', handleConnect);
-    client.on('error', handleError);
-    client.on('close', handleClose);
-
-    // Cleanup function
-    return () => {
-      client.off('connect', handleConnect);
-      client.off('error', handleError);
-      client.off('close', handleClose);
-    };
-  }, []);
 
   const publishSessionStart = useCallback((userId: string) => {
     if (!userId) {
@@ -50,11 +18,8 @@ export const useMqtt = (): UseMqttReturn => {
       return;
     }
 
-    if (!isConnectedRef.current) {
-      toast(TOAST_MESSAGES.ERROR.NETWORK);
-      return;
-    }
-
+    // Publish directly without checking frontend MQTT connection
+    // SessionControl already validates backend connectivity
     mqttService.publish(APP_CONFIG.MQTT.TOPICS.SESSION_START, userId);
     toast(TOAST_MESSAGES.TRIP.STARTED);
   }, [toast]);
@@ -65,11 +30,8 @@ export const useMqtt = (): UseMqttReturn => {
       return;
     }
 
-    if (!isConnectedRef.current) {
-      toast(TOAST_MESSAGES.ERROR.NETWORK);
-      return;
-    }
-
+    // Publish directly without checking frontend MQTT connection  
+    // SessionControl already validates backend connectivity
     mqttService.publish(APP_CONFIG.MQTT.TOPICS.SESSION_STOP, userId);
     toast(TOAST_MESSAGES.TRIP.ENDED);
   }, [toast]);
@@ -77,6 +39,6 @@ export const useMqtt = (): UseMqttReturn => {
   return {
     publishSessionStart,
     publishSessionStop,
-    isConnected: isConnectedRef.current,
+    isConnected: true, // Always true since validation is done by SessionControl
   };
 };
