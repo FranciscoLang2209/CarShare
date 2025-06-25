@@ -403,7 +403,7 @@ export default function CarDetailPage() {
 												</div>
 												<div>
 													<p className="text-sm text-muted-foreground">Costo</p>
-													<p className="font-medium text-green-600">
+													<p className="font-medium text-red-600">
 														${calculateTripCost(session.distance, car.fuelEfficiency).toFixed(2)}
 													</p>
 												</div>
