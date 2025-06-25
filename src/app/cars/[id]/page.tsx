@@ -45,15 +45,15 @@ export default function CarDetailPage() {
 
 			try {
 				console.log('📞 Llamando a carApi.getCarById...');
+				console.log('🔑 CarId que se va a usar:', carId, 'longitud:', carId.length);
 				// Fetch car details
 				const carResponse = await carApi.getCarById(carId);
 				console.log('🚗 Respuesta del car:', carResponse);
 				
 				if (carResponse.success && carResponse.data) {
-					// Parse the car data to handle string-formatted admin and users
-					const parsedCar = parseCarData(carResponse.data);
-					setCar(parsedCar);
-					console.log('✅ Car cargado y parseado exitosamente:', parsedCar);
+					setCar(carResponse.data);
+					console.log('✅ Car cargado exitosamente:', carResponse.data);
+					console.log('🆔 Car ID después de parsing:', carResponse.data.id, 'longitud:', carResponse.data.id?.length);
 				} else {
 					console.error('❌ Error cargando car:', carResponse.error);
 					setError('No se pudo cargar la información del vehículo');

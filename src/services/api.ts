@@ -265,6 +265,9 @@ export const sessionApi = {
 function parseCarData(rawCar: any): Car {
   if (!rawCar) return rawCar;
   
+  console.log('🔍 parseCarData - Raw car data:', rawCar);
+  console.log('🆔 parseCarData - Original car ID:', rawCar.id, 'length:', rawCar.id?.length);
+  
   const car = { ...rawCar };
   
   // Parse admin field if it's a string
@@ -273,8 +276,9 @@ function parseCarData(rawCar: any): Car {
       const cleanStr = car.admin.replace(/new ObjectId\('([^']+)'\)/g, '"$1"')
                                 .replace(/(\w+):/g, '"$1":');
       car.admin = JSON.parse(cleanStr);
+      console.log('✅ parseCarData - Admin parsed successfully');
     } catch (e) {
-      console.error('Error parsing car admin data:', e);
+      console.error('❌ Error parsing car admin data:', e);
     }
   }
   
@@ -293,7 +297,11 @@ function parseCarData(rawCar: any): Car {
       }
       return user;
     });
+    console.log('✅ parseCarData - Users parsed successfully');
   }
+  
+  console.log('🔍 parseCarData - Final car data:', car);
+  console.log('🆔 parseCarData - Final car ID:', car.id, 'length:', car.id?.length);
   
   return car;
 }
