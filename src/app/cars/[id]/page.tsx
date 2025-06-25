@@ -288,7 +288,7 @@ export default function CarDetailPage() {
 										🚗 Viaje en progreso
 									</p>
 									<p className="text-xs text-blue-600">
-										Iniciado: {new Date(activeSession.start_time).toLocaleString('es-ES')}
+										Iniciado: {new Date(activeSession.startTime).toLocaleString('es-ES')}
 									</p>
 									<p className="text-xs text-blue-600">
 										Distancia: {activeSession.distance.toFixed(2)} km
@@ -379,8 +379,8 @@ export default function CarDetailPage() {
 						{sessions.length > 0 ? (
 							<div className="space-y-4">							{sessions.map((session, index) => {
 								console.log('🚗 Session data:', session);
-								console.log('🗓️ Start time:', session.start_time, 'type:', typeof session.start_time);
-								console.log('🗓️ End time:', session.end_time, 'type:', typeof session.end_time);
+								console.log('🗓️ Start time:', session.startTime, 'type:', typeof session.startTime);
+								console.log('🗓️ End time:', session.endTime, 'type:', typeof session.endTime);
 								
 								return (
 								<Card key={session.id || `session-${index}`} className="border-l-4 border-l-blue-500">
@@ -403,7 +403,7 @@ export default function CarDetailPage() {
 												<div>
 													<p className="text-sm text-muted-foreground">Fecha</p>
 													<p className="font-medium">
-														{formatDate(session.start_time)}
+														{formatDate(session.startTime)}
 													</p>
 												</div>
 											</div>

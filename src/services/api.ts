@@ -145,7 +145,7 @@ export const sessionApi = {
         const userSessionsResponse = await apiRequest<Session[]>(`/user/sessions?id=${encodeURIComponent(userId)}`, { cache: 'no-store' });
         if (userSessionsResponse.success && userSessionsResponse.data) {
           const activeSessions = userSessionsResponse.data.filter(session => 
-            session.isActive === true || (!session.end_time && session.start_time)
+            session.isActive === true || (!session.endTime && !session.end_time && (session.startTime || session.start_time))
           );
           const activeSession = activeSessions.length > 0 ? activeSessions[0] : null;
           return { success: true, data: activeSession };
@@ -155,7 +155,7 @@ export const sessionApi = {
         const allSessionsResponse = await this.getSessions();
         if (allSessionsResponse.success && allSessionsResponse.data) {
           const activeSessions = allSessionsResponse.data.filter(session => 
-            session.isActive === true || (!session.end_time && session.start_time)
+            session.isActive === true || (!session.endTime && !session.end_time && (session.startTime || session.start_time))
           );
           const activeSession = activeSessions.length > 0 ? activeSessions[0] : null;
           return { success: true, data: activeSession };

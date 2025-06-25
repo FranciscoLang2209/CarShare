@@ -22,10 +22,12 @@ export const useSessions = (): UseSessionsReturn => {
       const response = await sessionApi.getSessions();
       
       if (response.success && response.data) {
-        // Sort sessions by start_time (most recent first)
-        const sortedSessions = response.data.sort((a, b) => 
-          new Date(b.start_time).getTime() - new Date(a.start_time).getTime()
-        );
+        // Sort sessions by startTime (most recent first)
+        const sortedSessions = response.data.sort((a, b) => {
+          const timeA = new Date(a.startTime || a.start_time || 0).getTime();
+          const timeB = new Date(b.startTime || b.start_time || 0).getTime();
+          return timeB - timeA;
+        });
         setSessions(sortedSessions);
       } else {
         setError(response.error || 'Failed to fetch sessions');

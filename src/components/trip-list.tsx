@@ -98,8 +98,8 @@ const TripList = memo(() => {
 					<TableBody>
 						{sessions.map((session, index) => {
 							console.log('🚗 Session data:', session);
-							console.log('🗓️ Start time:', session.start_time, 'type:', typeof session.start_time);
-							console.log('🗓️ End time:', session.end_time, 'type:', typeof session.end_time);
+							console.log('🗓️ Start time:', session.startTime, 'type:', typeof session.startTime);
+							console.log('🗓️ End time:', session.endTime, 'type:', typeof session.endTime);
 							
 							// Use car-specific fuel efficiency if available, otherwise use default
 							const fuelEfficiency = session.car?.fuelEfficiency;
@@ -116,8 +116,8 @@ const TripList = memo(() => {
 										{session.distance} km
 									</TableCell>
 									<TableCell className="hidden md:table-cell">
-										<time dateTime={session.start_time}>
-											{formatDate(session.start_time)}
+										<time dateTime={session.startTime}>
+											{formatDate(session.startTime)}
 										</time>
 									</TableCell>
 									<TableCell className="text-right font-semibold">
