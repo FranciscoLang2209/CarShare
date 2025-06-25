@@ -28,6 +28,7 @@ import { CalendarDays, Car as CarIcon, Users, Fuel, Settings, ArrowLeft, Trendin
 import { useRouter } from "next/navigation";
 import { CarSchema, CarFormData } from "@/schemas/car";
 import { useCars } from "@/hooks/useCars";
+import { FuelTypeSelector } from "@/components/ui/fuel-type-selector";
 import { useAuth } from "@/hooks/useAuth";
 import { MultiSelect } from "@/components/ui/multi-select-simple";
 import { Car } from "@/types";
@@ -186,8 +187,8 @@ const CarCard = memo(({ car, isAdmin, onDelete }: {
 					<div>
 						<p className="text-sm font-medium text-muted-foreground mb-2">Usuarios compartidos:</p>
 						<div className="flex flex-wrap gap-1">
-							{car.users.map((user) => (
-								<Badge key={user.id} variant="secondary" className="text-xs">
+							{car.users.map((user, index) => (
+								<Badge key={user.id || `user-${index}-${user.name}`} variant="secondary" className="text-xs">
 									{user.name}
 								</Badge>
 							))}
@@ -244,6 +245,7 @@ const AddCarForm = memo(() => {
 			brand: "",
 			year: new Date().getFullYear(),
 			fuelEfficiency: 11.5,
+			fuelType: "Nafta Super",
 			users: [],
 		},
 	});
@@ -362,6 +364,23 @@ const AddCarForm = memo(() => {
 								)}
 							/>
 						</div>
+
+						<FormField
+							control={form.control}
+							name="fuelType"
+							render={({ field }) => (
+								<FormItem>
+									<FormLabel>Tipo de Combustible</FormLabel>
+									<FormControl>
+										<FuelTypeSelector
+											value={field.value}
+											onChange={field.onChange}
+										/>
+									</FormControl>
+									<FormMessage />
+								</FormItem>
+							)}
+						/>
 
 						<FormField
 							control={form.control}
