@@ -128,6 +128,13 @@ export const sessionApi = {
     });
   },
 
+  async getActiveSessions(userId?: string): Promise<ApiResponse<Session | null>> {
+    const endpoint = userId ? `/user/sessions/active?userId=${encodeURIComponent(userId)}` : '/user/sessions/active';
+    return apiRequest<Session | null>(endpoint, {
+      cache: 'no-store',
+    });
+  },
+
   async getSessionsByCar(carId: string): Promise<ApiResponse<Session[]>> {
     if (!carId) {
       return { success: false, error: 'Car ID is required' };

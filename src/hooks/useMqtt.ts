@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { mqttService } from '@/services/mqtt';
 import { APP_CONFIG, TOAST_MESSAGES } from '@/constants/app';
 import { useToast } from '@/components/ui/use-toast';
+import { useSessionDebug } from './useSessionDebug';
 
 interface UseMqttReturn {
   publishSessionStart: (userId: string) => void;
@@ -11,6 +12,7 @@ interface UseMqttReturn {
 
 export const useMqtt = (): UseMqttReturn => {
   const { toast } = useToast();
+  const { debugSessionFlow } = useSessionDebug();
 
   const publishSessionStart = useCallback((userId: string) => {
     if (!userId) {
@@ -18,11 +20,19 @@ export const useMqtt = (): UseMqttReturn => {
       return;
     }
 
+    // Debug logs
+    console.log('🚀 Iniciando viaje para userId:', userId);
+    console.log('📏 Longitud del userId:', userId.length);
+    console.log('🔍 Es ObjectId válido:', /^[0-9a-fA-F]{24}$/.test(userId));
+    
     // Publish directly without checking frontend MQTT connection
     // SessionControl already validates backend connectivity
     mqttService.publish(APP_CONFIG.MQTT.TOPICS.SESSION_START, userId);
     toast(TOAST_MESSAGES.TRIP.STARTED);
-  }, [toast]);
+    
+    // Debug del flujo completo
+    debugSessionFlow(userId);
+  }, [toast, debugSessionFlow]);
 
   const publishSessionStop = useCallback((userId: string) => {
     if (!userId) {
