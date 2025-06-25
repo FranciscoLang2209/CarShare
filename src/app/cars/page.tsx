@@ -377,8 +377,11 @@ const AddCarForm = memo(() => {
 							render={({ field }) => (
 								<FormItem>
 									<FuelTypeSlider
-										value={field.value}
-										onChange={field.onChange}
+										value={field.value || 'Nafta Super'}
+										onChange={(value) => {
+											console.log('FuelType changed:', value);
+											field.onChange(value);
+										}}
 										error={form.formState.errors.fuelType?.message}
 									/>
 									<FormMessage />
