@@ -370,7 +370,12 @@ const AddCarForm = memo(() => {
 							/>
 						</div>
 
-						{/* Tipo de combustible */}
+						{/* Tipo de combustible - DEBUGGING */}
+						<div className="w-full p-4 bg-red-100 border-2 border-red-500 rounded">
+							<h3 className="text-lg font-bold text-red-800">🚨 DEBUGGING FUEL TYPE 🚨</h3>
+							<p>Si ves esto, el lugar está correcto</p>
+						</div>
+						
 						<FormField
 							control={form.control}
 							name="fuelType"
