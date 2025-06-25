@@ -108,9 +108,9 @@ const TripList = memo(() => {
 							return (
 								<TableRow key={session.id || `session-${index}`}>
 									<TableCell>
-										<span className="font-medium">{session.user.name}</span>
+										<span className="font-medium">{session.user?.name || "Sin usuario"}</span>
 										<br />
-										<span className="text-xs text-muted-foreground">{session.user.email}</span>
+										<span className="text-xs text-muted-foreground">{session.user?.email || ""}</span>
 									</TableCell>
 									<TableCell className="hidden sm:table-cell">
 										{session.distance} km
@@ -120,7 +120,7 @@ const TripList = memo(() => {
 											{formatDate(session.startTime)}
 										</time>
 									</TableCell>
-									<TableCell className="text-right font-semibold">
+									<TableCell className="text-right font-semibold text-red-600">
 										$ {tripCost.toFixed(2)}
 										{session.car && (
 											<div className="text-xs text-muted-foreground">
