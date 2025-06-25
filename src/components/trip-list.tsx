@@ -108,9 +108,9 @@ const TripList = memo(() => {
 							return (
 								<TableRow key={session.id || `session-${index}`}>
 									<TableCell>
-										<span className="font-medium">
-											{session.user.name}
-										</span>
+										<span className="font-medium">{session.user.name}</span>
+										<br />
+										<span className="text-xs text-muted-foreground">{session.user.email}</span>
 									</TableCell>
 									<TableCell className="hidden sm:table-cell">
 										{session.distance} km

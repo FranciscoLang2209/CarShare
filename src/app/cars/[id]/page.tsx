@@ -329,9 +329,9 @@ export default function CarDetailPage() {
 					<Card>
 						<CardContent className="p-6">
 							<div className="flex items-center gap-3">
-								<DollarSign className="h-8 w-8 text-green-600" />
+								<DollarSign className="h-8 w-8 text-red-600" />
 								<div>
-									<p className="text-2xl font-bold text-green-600">
+									<p className="text-2xl font-bold text-red-600">
 										${carStats.totalCost.toFixed(2)}
 									</p>
 									<p className="text-sm text-muted-foreground">Costo Total</p>
