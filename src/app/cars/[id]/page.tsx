@@ -284,7 +284,7 @@ export default function CarDetailPage() {
 							)}
 							
 							<div className="max-w-sm mx-auto">
-								<SessionControl />
+								<SessionControl carId={carId} />
 							</div>
 						</div>
 					</Card>

@@ -30,6 +30,7 @@ export interface Session {
 	start_time: string;
 	end_time?: string;
 	car?: Car; // Optional car information for enhanced cost calculation
+	isActive?: boolean; // Added based on backend API response
 }
 
 export interface AuthContextType {

@@ -7,21 +7,23 @@ import { useAuth } from "@/hooks/useAuth";
 import { useMqtt } from "@/hooks/useMqtt";
 import { useBackendHealth } from "@/hooks/useBackendHealth";
 
-const SessionControl = memo(() => {
+interface SessionControlProps {
+	carId?: string;
+}
+
+const SessionControl = memo(({ carId }: SessionControlProps) => {
 	const { user } = useAuth();
 	const { publishSessionStart, publishSessionStop } = useMqtt();
 	const { isMqttConnected, isBackendConnected } = useBackendHealth();
 
-	const handleStart = () => {
+	const handleStart = async () => {
 		if (user) {
-			publishSessionStart(user);
+			await publishSessionStart(user, carId);
 		}
 	};
 
-	const handleStop = () => {
-		if (user) {
-			publishSessionStop(user);
-		}
+	const handleStop = async () => {
+		await publishSessionStop();
 	};
 
 	// Both backend and MQTT need to be connected for trips to work
